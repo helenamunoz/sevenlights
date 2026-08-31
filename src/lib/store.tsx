@@ -12,6 +12,7 @@ import {
 } from 'react';
 
 import { CHAKRA_IDS, type ChakraId } from '@/data/chakras';
+import { AppError } from '@/lib/errors';
 import { deletePhotoFile, newId } from '@/lib/photos';
 import { isSyncConfigured, supabase } from '@/lib/supabase';
 import { deleteRemoteImage, merge, pullBoards, pullImageFiles, pushBoard, pushImages } from '@/lib/sync';
@@ -203,9 +204,11 @@ export function BoardsProvider({ children }: { children: ReactNode }) {
       pending.current.clear();
       setSync({ status: 'idle', lastSyncedAt: new Date().toISOString() });
     } catch (error) {
+      // Supabase's own wording is more specific than anything we would put in
+      // its place; only our own failures get translated, in the screen.
       setSync({
         status: 'error',
-        message: error instanceof Error ? error.message : 'No se pudo sincronizar',
+        message: error instanceof Error ? error.message : '',
       });
     }
   }, [session]);
@@ -229,13 +232,13 @@ export function BoardsProvider({ children }: { children: ReactNode }) {
   /* ---------- auth ---------- */
 
   const signIn = useCallback(async (email: string) => {
-    if (!supabase) throw new Error('Sync no está configurado todavía');
+    if (!supabase) throw new AppError('sync-not-configured');
     const { error } = await supabase.auth.signInWithOtp({ email });
     if (error) throw error;
   }, []);
 
   const verify = useCallback(async (email: string, code: string) => {
-    if (!supabase) throw new Error('Sync no está configurado todavía');
+    if (!supabase) throw new AppError('sync-not-configured');
     const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
     if (error) throw error;
   }, []);
@@ -285,7 +288,7 @@ export function BoardsProvider({ children }: { children: ReactNode }) {
 
 export function useBoards(): StoreValue {
   const value = useContext(StoreContext);
-  if (!value) throw new Error('useBoards debe usarse dentro de <BoardsProvider>');
+  if (!value) throw new Error('useBoards must be used inside <BoardsProvider>');
   return value;
 }
 

@@ -1,6 +1,8 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 
+import { AppError } from '@/lib/errors';
+
 /**
  * Photos picked from the camera roll live in a temporary cache directory, so
  * we copy each one into the app's documents dir and keep that URI. Uploading
@@ -20,7 +22,7 @@ export type PickedPhoto = { id: string; localUri: string };
 
 export async function pickPhotos(): Promise<PickedPhoto[]> {
   const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) throw new Error('sin-permiso');
+  if (!permission.granted) throw new AppError('photo-permission');
 
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ['images'],
@@ -36,7 +38,7 @@ export async function pickPhotos(): Promise<PickedPhoto[]> {
 
 export async function takePhoto(): Promise<PickedPhoto | null> {
   const permission = await ImagePicker.requestCameraPermissionsAsync();
-  if (!permission.granted) throw new Error('sin-permiso');
+  if (!permission.granted) throw new AppError('photo-permission');
 
   const result = await ImagePicker.launchCameraAsync({ quality: 0.85, exif: false });
   if (result.canceled || !result.assets[0]) return null;

@@ -2,10 +2,14 @@ import { StyleSheet, View } from 'react-native';
 
 import { alpha } from '@/theme/tokens';
 
+/** How many circles a bloom is built from. Enough that no ring reads as an edge. */
+const RINGS = 14;
+
 /**
  * The glow behind a chakra. React Native has no radial gradient, so the bloom
- * is built from concentric circles of decreasing opacity — cheap to render and
- * indistinguishable from a blur at these sizes.
+ * is built from concentric circles of the same low opacity, packed tighter
+ * toward the middle — cheap to render, and at this many rings indistinguishable
+ * from a blur.
  */
 export function Aura({
   color,
@@ -16,27 +20,20 @@ export function Aura({
   size: number;
   intensity?: number;
 }) {
-  const rings = [
-    { scale: 1, opacity: 0.1 * intensity },
-    { scale: 0.72, opacity: 0.13 * intensity },
-    { scale: 0.48, opacity: 0.17 * intensity },
-    { scale: 0.28, opacity: 0.22 * intensity },
-    { scale: 0.14, opacity: 0.3 * intensity },
-  ];
-
   return (
     <View pointerEvents="none" style={[styles.wrap, { width: size, height: size }]}>
-      {rings.map((ring) => {
-        const d = size * ring.scale;
+      {Array.from({ length: RINGS }, (_, i) => {
+        // Rings crowd toward the center, so light gathers there the way it does.
+        const d = size * Math.pow(1 - i / RINGS, 1.7);
         return (
           <View
-            key={ring.scale}
+            key={i}
             style={{
               position: 'absolute',
               width: d,
               height: d,
               borderRadius: d / 2,
-              backgroundColor: alpha(color, ring.opacity),
+              backgroundColor: alpha(color, 0.046 * intensity),
             }}
           />
         );

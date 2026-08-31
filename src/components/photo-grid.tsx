@@ -3,9 +3,11 @@ import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
+import { useLocale } from '@/i18n';
+import { messageFor } from '@/lib/errors';
 import { pickPhotos, takePhoto, type PickedPhoto } from '@/lib/photos';
 import type { BoardImage } from '@/lib/types';
-import { alpha, color, font, radius, space } from '@/theme/tokens';
+import { alpha, color, radius, space, type } from '@/theme/tokens';
 
 /**
  * The images on a board. Two columns, square tiles, tap to enlarge, long-press
@@ -22,6 +24,7 @@ export function PhotoGrid({
   onAdd: (photos: PickedPhoto[]) => void;
   onRemove: (imageId: string) => void;
 }) {
+  const { t } = useLocale();
   const { width } = useWindowDimensions();
   const [zoomed, setZoomed] = useState<BoardImage | null>(null);
   const [busy, setBusy] = useState(false);
@@ -38,35 +41,31 @@ export function PhotoGrid({
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     } catch (error) {
-      const message =
-        error instanceof Error && error.message === 'sin-permiso'
-          ? 'SevenLights necesita permiso para ver tus fotos. Se cambia en Ajustes.'
-          : 'No se pudo agregar la imagen.';
-      Alert.alert('Imágenes', message);
+      Alert.alert(t.photos.alertTitle, messageFor(error, t));
     } finally {
       setBusy(false);
     }
   }
 
   function offerSources() {
-    Alert.alert('Sumar imagen', undefined, [
-      { text: 'Elegir de la galería', onPress: () => run(pickPhotos) },
-      { text: 'Sacar una foto', onPress: () => run(takePhoto) },
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t.photos.sourceTitle, undefined, [
+      { text: t.photos.fromLibrary, onPress: () => run(pickPhotos) },
+      { text: t.photos.fromCamera, onPress: () => run(takePhoto) },
+      { text: t.photos.cancel, style: 'cancel' },
     ]);
   }
 
   function confirmRemove(image: BoardImage) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert('Quitar esta imagen', 'Sale del tablero en todos tus dispositivos.', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Quitar', style: 'destructive', onPress: () => onRemove(image.id) },
+    Alert.alert(t.photos.removeTitle, t.photos.removeBody, [
+      { text: t.photos.cancel, style: 'cancel' },
+      { text: t.photos.remove, style: 'destructive', onPress: () => onRemove(image.id) },
     ]);
   }
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>Imágenes</Text>
+      <Text style={styles.label}>{t.board.images}</Text>
 
       <View style={styles.grid}>
         {images.map((image) => (
@@ -83,7 +82,7 @@ export function PhotoGrid({
                 transition={220}
               />
             ) : (
-              <Text style={styles.pending}>Descargando…</Text>
+              <Text style={styles.pending}>{t.board.downloading}</Text>
             )}
           </Pressable>
         ))}
@@ -94,7 +93,7 @@ export function PhotoGrid({
           style={[styles.add, { width: tile, height: tile, borderColor: alpha(accent, 0.4) }]}>
           <Text style={[styles.addPlus, { color: accent }]}>{busy ? '·' : '+'}</Text>
           <Text style={styles.addText}>
-            {busy ? 'preparando…' : images.length ? 'sumar imagen' : 'sumar la primera'}
+            {busy ? t.board.preparing : images.length ? t.board.addImage : t.board.addFirstImage}
           </Text>
         </Pressable>
       </View>
@@ -112,14 +111,7 @@ export function PhotoGrid({
 
 const styles = StyleSheet.create({
   wrap: { marginBottom: space.lg },
-  label: {
-    fontFamily: font.bodyMedium,
-    fontSize: 10,
-    letterSpacing: 1.8,
-    textTransform: 'uppercase',
-    color: color.textFaint,
-    marginBottom: space.sm,
-  },
+  label: { ...type.label, color: color.textFaint, marginBottom: space.sm },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   tile: {
     borderRadius: radius.md,
@@ -128,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pending: { fontFamily: font.body, fontSize: 12, color: color.textFaint },
+  pending: { ...type.caption, color: color.textFaint },
   add: {
     borderRadius: radius.md,
     borderWidth: 1,
@@ -138,11 +130,11 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: color.ink2,
   },
-  addPlus: { fontFamily: font.display, fontSize: 30, lineHeight: 34 },
-  addText: { fontFamily: font.body, fontSize: 12, color: color.textFaint },
+  addPlus: { fontFamily: type.lead.fontFamily, fontSize: 30, lineHeight: 34 },
+  addText: { ...type.caption, color: color.textFaint },
   zoomBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(8, 6, 12, 0.95)',
+    backgroundColor: alpha(color.ink, 0.95),
     alignItems: 'center',
     justifyContent: 'center',
     padding: space.lg,

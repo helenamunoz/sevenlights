@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { alpha, color, font, space } from '@/theme/tokens';
+import { alpha, color, space, type } from '@/theme/tokens';
 
 /**
  * A labelled, self-saving text field. Local state keeps typing smooth; the
@@ -62,22 +62,8 @@ export function Field({
 
 const styles = StyleSheet.create({
   field: { marginBottom: space.lg },
-  label: {
-    fontFamily: font.bodyMedium,
-    fontSize: 10,
-    letterSpacing: 1.8,
-    textTransform: 'uppercase',
-    color: color.textFaint,
-    marginBottom: space.sm,
-  },
+  label: { ...type.label, color: color.textFaint, marginBottom: space.sm },
   frame: { borderLeftWidth: 2, paddingLeft: space.md, paddingVertical: 2, borderRadius: 2 },
-  input: {
-    fontFamily: font.display,
-    fontSize: 20,
-    lineHeight: 29,
-    color: color.text,
-    padding: 0,
-    minHeight: 29,
-  },
-  inputItalic: { fontFamily: font.displayItalic, fontSize: 22 },
+  input: { ...type.lead, color: color.text, padding: 0, minHeight: type.lead.lineHeight },
+  inputItalic: { fontFamily: type.quote.fontFamily, fontSize: 22 },
 });

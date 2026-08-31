@@ -6,6 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "sevenlights",
+    "locales": {
+      "es": "./assets/locales/es.json",
+      "en": "./assets/locales/en.json"
+    },
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0E0C14",
     "ios": {
@@ -33,14 +37,14 @@
         {
           "backgroundColor": "#0E0C14",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 148
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "SevenLights usa tus fotos para armar los tableros de cada centro.",
-          "cameraPermission": "SevenLights usa la cámara para sumar una foto al tablero."
+          "photosPermission": "Siete Luces usa tus fotos para armar los tableros de cada centro.",
+          "cameraPermission": "Siete Luces usa la cámara para sumar una foto al tablero."
         }
       ]
     ],

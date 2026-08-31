@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,14 +12,22 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Body, Card, Label, PrimaryButton, QuietButton, Segmented } from '@/components/ui';
+import { LOCALE_NAMES, LOCALES, useLocale, type Locale } from '@/i18n';
+import { messageFor } from '@/lib/errors';
 import { useBoards } from '@/lib/store';
 import { isSyncConfigured } from '@/lib/supabase';
-import { color, font, radius, space } from '@/theme/tokens';
+import { color, radius, space, type } from '@/theme/tokens';
 
+/**
+ * Everything about the app rather than about a board: the language it speaks,
+ * and whether the boards go anywhere beyond this phone.
+ */
 export default function AccountScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { session, sync, syncNow, signIn, verify, signOut } = useBoards();
+  const { locale, setLocale, t, fill, tag } = useLocale();
 
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -34,7 +41,7 @@ export default function AccountScreen() {
     try {
       await action();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Algo falló. Probá de nuevo.');
+      setError(messageFor(e, t));
     } finally {
       setBusy(false);
     }
@@ -52,82 +59,88 @@ export default function AccountScreen() {
         }}
         keyboardShouldPersistTaps="handled">
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow}>
-          <Text style={styles.back}>← Columna</Text>
+          <Text style={styles.back}>{t.board.back}</Text>
         </Pressable>
 
-        <Text style={styles.title}>Sincronización</Text>
+        <Text style={styles.title}>{t.settings.title}</Text>
+
+        <Card style={styles.section}>
+          <Label>{t.settings.language}</Label>
+          <Segmented<Locale>
+            options={LOCALES.map((option) => ({ value: option, label: LOCALE_NAMES[option] }))}
+            value={locale}
+            onChange={setLocale}
+          />
+          <Body tone="faint">{t.settings.languageHint}</Body>
+        </Card>
+
+        <Text style={styles.sectionTitle}>{t.settings.sync}</Text>
 
         {!isSyncConfigured ? (
-          <View style={styles.card}>
-            <Text style={styles.body}>
-              Los tableros viven solo en este teléfono. Para verlos también en la web hay que
-              conectar Supabase: copiá <Text style={styles.mono}>.env.example</Text> a{' '}
-              <Text style={styles.mono}>.env.local</Text>, poné la URL y la anon key del proyecto, y
-              corré el SQL de <Text style={styles.mono}>supabase/schema.sql</Text>.
-            </Text>
-            <Text style={styles.bodyFaint}>Los pasos completos están en el README.</Text>
-          </View>
+          <Card>
+            <Label>{t.settings.notConfiguredTitle}</Label>
+            <Body>{t.settings.notConfiguredBody}</Body>
+            <Body tone="faint">{t.settings.notConfiguredMore}</Body>
+          </Card>
         ) : session ? (
-          <View style={styles.card}>
-            <Text style={styles.label}>Sesión</Text>
-            <Text style={styles.body}>{session.user.email}</Text>
+          <Card>
+            <Label>{t.settings.session}</Label>
+            <Body>{session.user.email}</Body>
 
-            <Text style={[styles.label, styles.spaced]}>Estado</Text>
-            <Text style={styles.body}>
+            <View style={styles.spaced}>
+              <Label>{t.settings.state}</Label>
+            </View>
+            <Body>
               {sync.status === 'syncing'
-                ? 'Sincronizando…'
+                ? t.sync.syncing
                 : sync.status === 'error'
-                  ? sync.message
+                  ? sync.message || t.errors['sync-failed']
                   : sync.status === 'idle' && sync.lastSyncedAt
-                    ? `Última vez: ${new Date(sync.lastSyncedAt).toLocaleString('es-UY')}`
-                    : 'Sin sincronizar todavía'}
-            </Text>
+                    ? fill(t.settings.lastSynced, {
+                        when: new Date(sync.lastSyncedAt).toLocaleString(tag),
+                      })
+                    : t.settings.neverSynced}
+            </Body>
 
-            <Pressable
-              style={styles.primary}
+            <PrimaryButton
+              label={t.settings.syncNow}
               onPress={() => attempt(syncNow)}
-              disabled={sync.status === 'syncing'}>
-              <Text style={styles.primaryText}>Sincronizar ahora</Text>
-            </Pressable>
-            <Pressable style={styles.secondary} onPress={() => attempt(signOut)}>
-              <Text style={styles.secondaryText}>Cerrar sesión</Text>
-            </Pressable>
-          </View>
+              disabled={sync.status === 'syncing'}
+            />
+            <QuietButton label={t.settings.signOut} onPress={() => attempt(signOut)} />
+          </Card>
         ) : (
-          <View style={styles.card}>
+          <Card>
             {stage === 'email' ? (
               <>
-                <Text style={styles.label}>Tu email</Text>
+                <Label>{t.settings.email}</Label>
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  placeholder="vos@ejemplo.com"
+                  placeholder={t.settings.emailPlaceholder}
                   placeholderTextColor={color.textFaint}
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
+                  accessibilityLabel={t.settings.email}
                   style={styles.input}
                 />
-                <Text style={styles.bodyFaint}>Te mandamos un código de seis dígitos.</Text>
-                <Pressable
-                  style={styles.primary}
-                  disabled={busy || !email.includes('@')}
+                <Body tone="faint">{t.settings.codeSent}</Body>
+                <PrimaryButton
+                  label={t.settings.sendCode}
+                  busy={busy}
+                  disabled={!email.includes('@')}
                   onPress={() =>
                     attempt(async () => {
                       await signIn(email.trim());
                       setStage('code');
                     })
-                  }>
-                  {busy ? (
-                    <ActivityIndicator color={color.ink} />
-                  ) : (
-                    <Text style={styles.primaryText}>Enviar código</Text>
-                  )}
-                </Pressable>
+                  }
+                />
               </>
             ) : (
               <>
-                <Text style={styles.label}>Código</Text>
+                <Label>{t.settings.code}</Label>
                 <TextInput
                   value={code}
                   onChangeText={setCode}
@@ -135,24 +148,19 @@ export default function AccountScreen() {
                   placeholderTextColor={color.textFaint}
                   keyboardType="number-pad"
                   maxLength={6}
+                  accessibilityLabel={t.settings.code}
                   style={[styles.input, styles.code]}
                 />
-                <Pressable
-                  style={styles.primary}
-                  disabled={busy || code.length < 6}
-                  onPress={() => attempt(() => verify(email.trim(), code.trim()))}>
-                  {busy ? (
-                    <ActivityIndicator color={color.ink} />
-                  ) : (
-                    <Text style={styles.primaryText}>Entrar</Text>
-                  )}
-                </Pressable>
-                <Pressable style={styles.secondary} onPress={() => setStage('email')}>
-                  <Text style={styles.secondaryText}>Usar otro email</Text>
-                </Pressable>
+                <PrimaryButton
+                  label={t.settings.enter}
+                  busy={busy}
+                  disabled={code.length < 6}
+                  onPress={() => attempt(() => verify(email.trim(), code.trim()))}
+                />
+                <QuietButton label={t.settings.otherEmail} onPress={() => setStage('email')} />
               </>
             )}
-          </View>
+          </Card>
         )}
 
         {error && <Text style={styles.error}>{error}</Text>}
@@ -164,33 +172,11 @@ export default function AccountScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.ink },
   backRow: { paddingVertical: space.sm, alignSelf: 'flex-start' },
-  back: { fontFamily: font.body, fontSize: 14, color: color.textSoft },
-  title: {
-    fontFamily: font.display,
-    fontSize: 36,
-    color: color.text,
-    marginTop: space.md,
-    marginBottom: space.lg,
-  },
-  card: {
-    backgroundColor: color.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: color.line,
-    padding: space.lg,
-    gap: space.sm,
-  },
-  label: {
-    fontFamily: font.bodyMedium,
-    fontSize: 10,
-    letterSpacing: 1.8,
-    textTransform: 'uppercase',
-    color: color.textFaint,
-  },
+  back: { ...type.bodySmall, fontSize: 14, color: color.textSoft },
+  title: { ...type.title, color: color.text, marginTop: space.md, marginBottom: space.lg },
+  section: { marginBottom: space.xl },
+  sectionTitle: { ...type.label, color: color.textFaint, marginBottom: space.md },
   spaced: { marginTop: space.md },
-  body: { fontFamily: font.body, fontSize: 15, lineHeight: 23, color: color.text },
-  bodyFaint: { fontFamily: font.body, fontSize: 13, lineHeight: 20, color: color.textFaint },
-  mono: { fontFamily: font.bodyMedium, color: color.textSoft },
   input: {
     backgroundColor: color.ink2,
     borderRadius: radius.sm,
@@ -198,26 +184,10 @@ const styles = StyleSheet.create({
     borderColor: color.line,
     paddingHorizontal: space.md,
     paddingVertical: space.md,
-    fontFamily: font.body,
+    ...type.body,
     fontSize: 16,
     color: color.text,
   },
   code: { fontSize: 22, letterSpacing: 6, textAlign: 'center' },
-  primary: {
-    marginTop: space.md,
-    backgroundColor: color.text,
-    borderRadius: radius.pill,
-    paddingVertical: space.md,
-    alignItems: 'center',
-  },
-  primaryText: { fontFamily: font.bodyBold, fontSize: 14, color: color.ink },
-  secondary: { marginTop: space.sm, paddingVertical: space.sm, alignItems: 'center' },
-  secondaryText: { fontFamily: font.body, fontSize: 13, color: color.textSoft },
-  error: {
-    fontFamily: font.body,
-    fontSize: 13,
-    color: color.danger,
-    marginTop: space.md,
-    textAlign: 'center',
-  },
+  error: { ...type.bodySmall, color: color.danger, marginTop: space.md, textAlign: 'center' },
 });
