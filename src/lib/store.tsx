@@ -12,7 +12,7 @@ import {
 } from 'react';
 
 import { CHAKRA_IDS, type ChakraId } from '@/data/chakras';
-import { AppError } from '@/lib/errors';
+import { signInWithGoogle } from '@/lib/auth';
 import { deletePhotoFile, newId } from '@/lib/photos';
 import { isSyncConfigured, supabase } from '@/lib/supabase';
 import { deleteRemoteImage, merge, pullBoards, pullImageFiles, pushBoard, pushImages } from '@/lib/sync';
@@ -48,8 +48,7 @@ type StoreValue = {
   removeImage: (chakra: ChakraId, imageId: string) => void;
   setCaption: (chakra: ChakraId, imageId: string, caption: string) => void;
   syncNow: () => Promise<void>;
-  signIn: (email: string) => Promise<void>;
-  verify: (email: string, code: string) => Promise<void>;
+  signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -231,17 +230,9 @@ export function BoardsProvider({ children }: { children: ReactNode }) {
 
   /* ---------- auth ---------- */
 
-  const signIn = useCallback(async (email: string) => {
-    if (!supabase) throw new AppError('sync-not-configured');
-    const { error } = await supabase.auth.signInWithOtp({ email });
-    if (error) throw error;
-  }, []);
-
-  const verify = useCallback(async (email: string, code: string) => {
-    if (!supabase) throw new AppError('sync-not-configured');
-    const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
-    if (error) throw error;
-  }, []);
+  // Google is the only door in. The session it leaves behind is what every
+  // sync is authorized with; onAuthStateChange above picks it up.
+  const signIn = useCallback(signInWithGoogle, []);
 
   const signOut = useCallback(async () => {
     await supabase?.auth.signOut();
@@ -262,7 +253,6 @@ export function BoardsProvider({ children }: { children: ReactNode }) {
       setCaption,
       syncNow,
       signIn,
-      verify,
       signOut,
     }),
     [
@@ -278,7 +268,6 @@ export function BoardsProvider({ children }: { children: ReactNode }) {
       setCaption,
       syncNow,
       signIn,
-      verify,
       signOut,
     ]
   );

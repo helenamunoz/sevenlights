@@ -1,15 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Body, Card, Label, PrimaryButton, QuietButton, Segmented } from '@/components/ui';
@@ -17,7 +8,7 @@ import { LOCALE_NAMES, LOCALES, useLocale, type Locale } from '@/i18n';
 import { messageFor } from '@/lib/errors';
 import { useBoards } from '@/lib/store';
 import { isSyncConfigured } from '@/lib/supabase';
-import { color, radius, space, type } from '@/theme/tokens';
+import { color, space, type } from '@/theme/tokens';
 
 /**
  * Everything about the app rather than about a board: the language it speaks,
@@ -26,12 +17,9 @@ import { color, radius, space, type } from '@/theme/tokens';
 export default function AccountScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { session, sync, syncNow, signIn, verify, signOut } = useBoards();
+  const { session, sync, syncNow, signIn, signOut } = useBoards();
   const { locale, setLocale, t, fill, tag } = useLocale();
 
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
-  const [stage, setStage] = useState<'email' | 'code'>('email');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,9 +36,7 @@ export default function AccountScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <View style={styles.screen}>
       <ScrollView
         contentContainerStyle={{
           paddingTop: insets.top + space.md,
@@ -111,61 +97,15 @@ export default function AccountScreen() {
           </Card>
         ) : (
           <Card>
-            {stage === 'email' ? (
-              <>
-                <Label>{t.settings.email}</Label>
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder={t.settings.emailPlaceholder}
-                  placeholderTextColor={color.textFaint}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  accessibilityLabel={t.settings.email}
-                  style={styles.input}
-                />
-                <Body tone="faint">{t.settings.codeSent}</Body>
-                <PrimaryButton
-                  label={t.settings.sendCode}
-                  busy={busy}
-                  disabled={!email.includes('@')}
-                  onPress={() =>
-                    attempt(async () => {
-                      await signIn(email.trim());
-                      setStage('code');
-                    })
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <Label>{t.settings.code}</Label>
-                <TextInput
-                  value={code}
-                  onChangeText={setCode}
-                  placeholder="123456"
-                  placeholderTextColor={color.textFaint}
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  accessibilityLabel={t.settings.code}
-                  style={[styles.input, styles.code]}
-                />
-                <PrimaryButton
-                  label={t.settings.enter}
-                  busy={busy}
-                  disabled={code.length < 6}
-                  onPress={() => attempt(() => verify(email.trim(), code.trim()))}
-                />
-                <QuietButton label={t.settings.otherEmail} onPress={() => setStage('email')} />
-              </>
-            )}
+            <Label>{t.settings.session}</Label>
+            <Body tone="faint">{t.settings.signInHint}</Body>
+            <PrimaryButton label={t.settings.signIn} busy={busy} onPress={() => attempt(signIn)} />
           </Card>
         )}
 
         {error && <Text style={styles.error}>{error}</Text>}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -177,17 +117,5 @@ const styles = StyleSheet.create({
   section: { marginBottom: space.xl },
   sectionTitle: { ...type.label, color: color.textFaint, marginBottom: space.md },
   spaced: { marginTop: space.md },
-  input: {
-    backgroundColor: color.ink2,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: color.line,
-    paddingHorizontal: space.md,
-    paddingVertical: space.md,
-    ...type.body,
-    fontSize: 16,
-    color: color.text,
-  },
-  code: { fontSize: 22, letterSpacing: 6, textAlign: 'center' },
   error: { ...type.bodySmall, color: color.danger, marginTop: space.md, textAlign: 'center' },
 });

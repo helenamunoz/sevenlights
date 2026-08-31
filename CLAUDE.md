@@ -12,6 +12,9 @@ It speaks Spanish and English, and picks up the phone's language on first launch
   and no account.
 - **Sync is last-write-wins per board.** One person, two devices: no merge UI,
   no conflict prompts. Photos carry their own ids and merge additively.
+- **Google is the only way in.** No passwords, no email codes. The session it
+  leaves behind is what authorizes every sync; without one the app simply stays
+  local. Setup is in the README.
 - **One visual world.** Ink-dark ground, each chakra its own light. There is no
   light theme, on purpose. Do not add one without asking.
 - **The mark is the app.** Seven lights on a thread, root at the bottom. It is
@@ -32,6 +35,7 @@ src/i18n/es.ts             the Spanish dictionary — the shape every other one 
 src/i18n/en.ts             the English dictionary
 src/i18n/index.tsx         LocaleProvider, useT / useLocale, {slot} filling
 src/lib/store.tsx          BoardsProvider: state, persistence, auth, sync triggers
+src/lib/auth.ts            Google sign-in: OAuth in a browser sheet, PKCE, deep link back
 src/lib/errors.ts          AppError + messageFor: our failures carry a code, not a sentence
 src/lib/sync.ts            Supabase pull/push, photo upload/download, merge()
 src/lib/photos.ts          picker + camera, copying files into permanent storage
@@ -63,16 +67,21 @@ supabase/schema.sql        tables, RLS policies, storage bucket
 
 ## Known gaps — good next tasks
 
-1. **Verify a real sync round-trip.** The Supabase layer is written but has only
-   been type-checked. Create the project, run `supabase/schema.sql`, sign in on
-   two devices, and confirm boards and photos actually cross.
-2. **Photo captions.** `setCaption` exists in the store; no UI reaches it yet.
-3. **Reordering photos** within a board.
-4. **Offline queue.** Right now a failed push waits for the next sync. A small
+1. **Verify a real sync round-trip.** The Supabase layer is written but has
+   never run against a live project. Follow the README, sign in on two devices,
+   and confirm boards and photos actually cross.
+2. **Deleting a photo does not reach a device that already has it.** `merge()`
+   unions images by id, so a photo removed on one phone comes back from the
+   other's local copy — while the confirmation says it leaves the board
+   everywhere. Either a tombstone list or a remote-authoritative image set
+   would settle it; today the copy is a promise the code does not keep.
+3. **Photo captions.** `setCaption` exists in the store; no UI reaches it yet.
+4. **Reordering photos** within a board.
+5. **Offline queue.** Right now a failed push waits for the next sync. A small
    retry queue would make it dependable on a subway.
-5. **Import from the web board.** Helena has an existing board at claude.ai with
+6. **Import from the web board.** Helena has an existing board at claude.ai with
    content in it; a one-time importer would save retyping.
-6. **A third language.** Adding one is a file in `src/i18n`, a `copy` block per
+7. **A third language.** Adding one is a file in `src/i18n`, a `copy` block per
    chakra, and an entry in `LOCALES` — nothing else should need touching.
 
 ## Running it

@@ -31,23 +31,73 @@ That step needs an Apple account. A free one signs builds that expire after
 
 ## Sync (optional)
 
-Without the two environment variables below the app is a local notebook: fast,
+Without the environment variables below the app is a local notebook: fast,
 private, no accounts. Add them and your boards follow you between devices.
+Signing in is Google only.
 
-1. Create a project at [supabase.com](https://supabase.com) (free tier is plenty).
-2. Open **SQL Editor → New query**, paste `supabase/schema.sql`, run it. That
-   creates the tables, the row level security policies, and the private photo
-   bucket.
-3. Copy the API details into a local env file:
+### 1. Create the Supabase project
 
-   ```bash
-   cp .env.example .env.local
+1. Go to [supabase.com](https://supabase.com) → **New project** (the free tier is
+   plenty). Give it a name, pick the region closest to you, and save the
+   database password somewhere — you will not be shown it again.
+2. Wait for it to finish provisioning, about two minutes.
+3. Open **SQL Editor → New query**, paste the whole of `supabase/schema.sql`,
+   and run it. That creates the two tables, the row level security policies,
+   and the private photo bucket.
+
+### 2. Make a Google OAuth client
+
+Sign-in goes through Google, so Google needs to know about this app.
+
+1. Open [console.cloud.google.com](https://console.cloud.google.com) and select
+   the project that already holds the Liminal credentials — the consent screen
+   there is set up (External, scopes `openid email profile`) and does not need
+   redoing.
+2. **APIs & Services → Credentials → Create credentials → OAuth client ID**,
+   type **Web application**. Name it something like `SevenLights (Supabase)`.
+   Make a new client rather than reusing Liminal's, so revoking one never takes
+   the other down with it.
+3. Under **Authorized redirect URIs**, add exactly one entry — Supabase's
+   callback, not the app's:
+
+   ```
+   https://<project-ref>.supabase.co/auth/v1/callback
    ```
 
-   Fill in `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from
-   **Project Settings → API**.
-4. Restart `npx expo start`, open **Ajustes / Settings** in the app, and sign in
-   with your email — Supabase sends a six-digit code.
+   Supabase prints this URL for you under **Authentication → Providers →
+   Google**; copy it from there rather than typing the project ref by hand.
+4. Copy the **Client ID** and **Client secret**.
+
+If that consent screen is still in **Testing**, only listed accounts can sign
+in — add your own address under **Audience → Test users**, or nothing will work
+and Google will not say why.
+
+### 3. Turn Google on in Supabase
+
+1. **Authentication → Providers → Google**: enable it, paste the client ID and
+   secret, save.
+2. **Authentication → URL Configuration → Redirect URLs**: add all three.
+
+   ```
+   sevenlights://**              the installed app
+   exp://**                      Expo Go, whose host changes with your network
+   http://localhost:8081/**      the app running in a browser
+   ```
+
+   This list is the step people skip. A redirect that is not on it comes back
+   as a generic failure with nothing in the logs to explain it.
+
+### 4. Point the app at it
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from
+**Project Settings → API**, then restart with `npx expo start --clear`. These
+values are baked in when the bundle is built, so a plain restart is not enough.
+
+Open **Ajustes / Settings** in the app and tap **Continuar con Google**.
 
 The anon key is safe in a public repo: it can only do what the policies in
 `schema.sql` allow, which is "read and write rows that belong to the signed-in
