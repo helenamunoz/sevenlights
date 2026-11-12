@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import { AppState, Platform } from 'react-native';
 
 /**
- * Supabase is optional at runtime. Without the two env vars the app is a
- * perfectly good local notebook; with them, boards sync across devices.
+ * Supabase is the source of truth: accounts, boards, challenges, files.
  *
  * Both values are safe to ship in a public repo — the anon key only grants
  * what row level security allows. The service role key never belongs here.
@@ -11,18 +11,25 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-export const isSyncConfigured = Boolean(url && anonKey);
+/** False until the two env vars are set; the root layout shows setup help. */
+export const isConfigured = Boolean(url && anonKey);
 
-export const supabase: SupabaseClient | null = isSyncConfigured
-  ? createClient(url!, anonKey!, {
-      auth: {
-        storage: AsyncStorage,
-        autoRefreshToken: true,
-        persistSession: true,
-        // No URL to parse in a native app; codes come through the OTP screen.
-        detectSessionInUrl: false,
-      },
-    })
-  : null;
+export const supabase = createClient(url || 'http://localhost', anonKey || 'not-configured', {
+  auth: {
+    storage: AsyncStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    // Sign-in is by emailed code, so there is never a session in the URL.
+    detectSessionInUrl: false,
+  },
+});
 
-export const IMAGE_BUCKET = 'board-images';
+// Tokens only need refreshing while the app is in front.
+if (Platform.OS !== 'web' && isConfigured) {
+  AppState.addEventListener('change', (state) => {
+    if (state === 'active') supabase.auth.startAutoRefresh();
+    else supabase.auth.stopAutoRefresh();
+  });
+}
+
+export const MEDIA_BUCKET = 'media';

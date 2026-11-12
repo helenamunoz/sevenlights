@@ -14,6 +14,10 @@ export const color = {
   textSoft: '#A79FB6',
   textFaint: '#6E667E',
   danger: '#D9544B',
+  ok: '#4E9E6A',
+  warn: '#DFA52C',
+  white: '#FFFFFF',
+  scrim: '#08060C',
 } as const;
 
 export const font = {

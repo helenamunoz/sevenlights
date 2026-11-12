@@ -23,7 +23,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -39,14 +39,25 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "SevenLights usa tus fotos para armar los tableros de cada centro.",
-          "cameraPermission": "SevenLights usa la cámara para sumar una foto al tablero."
+          "photosPermission": "SevenLights uses your photos to build your vision boards.",
+          "cameraPermission": "SevenLights uses the camera to add a photo to a board."
+        }
+      ],
+      "expo-localization",
+      "expo-audio",
+      [
+        "expo-notifications",
+        {
+          "color": "#9B6FD1"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "locales": {
+      "es": "./assets/locales/es.json"
     }
   }
 }

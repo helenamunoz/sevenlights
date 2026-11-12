@@ -5,8 +5,7 @@ import { alpha, color, font, space } from '@/theme/tokens';
 
 /**
  * A labelled, self-saving text field. Local state keeps typing smooth; the
- * store only hears about a change when the field loses focus or after a pause,
- * which is also when a sync push is scheduled.
+ * change is only saved — and sent — when the field loses focus.
  */
 export function Field({
   label,
@@ -14,6 +13,7 @@ export function Field({
   placeholder,
   accent,
   italic = false,
+  maxLength = 600,
   onChange,
 }: {
   label: string;
@@ -21,12 +21,13 @@ export function Field({
   placeholder: string;
   accent: string;
   italic?: boolean;
+  maxLength?: number;
   onChange: (value: string) => void;
 }) {
   const [draft, setDraft] = useState(value);
   const [focused, setFocused] = useState(false);
 
-  // Adopt values that arrive from a sync while this field is not being edited.
+  // Adopt values that arrive from the server while this field is not being edited.
   useEffect(() => {
     if (!focused) setDraft(value);
   }, [value, focused]);
@@ -51,6 +52,7 @@ export function Field({
           placeholder={placeholder}
           placeholderTextColor={color.textFaint}
           multiline
+          maxLength={maxLength}
           scrollEnabled={false}
           style={[styles.input, italic && styles.inputItalic]}
           accessibilityLabel={label}

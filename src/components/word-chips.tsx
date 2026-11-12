@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { t } from '@/lib/i18n';
 import { alpha, color, font, radius, space } from '@/theme/tokens';
 
-/** The handful of words that name a center. Short by design — one word each. */
+/**
+ * The handful of words that name a board. Short by design — one word each.
+ * Without `onAdd` and `onRemove` the chips are read-only.
+ */
 export function WordChips({
   words,
   accent,
@@ -12,28 +16,31 @@ export function WordChips({
 }: {
   words: string[];
   accent: string;
-  onAdd: (word: string) => void;
-  onRemove: (index: number) => void;
+  onAdd?: (word: string) => void;
+  onRemove?: (index: number) => void;
 }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
 
   function commit() {
     const word = draft.trim();
-    if (word) onAdd(word);
+    if (word) onAdd?.(word);
     setDraft('');
     setAdding(false);
   }
 
+  if (!onAdd && words.length === 0) return null;
+
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>Palabras</Text>
+      <Text style={styles.label}>{t('board.words')}</Text>
       <View style={styles.row}>
         {words.map((word, index) => (
           <Pressable
             key={`${word}-${index}`}
-            onLongPress={() => onRemove(index)}
-            accessibilityLabel={`${word}. Mantené apretado para quitar.`}
+            disabled={!onRemove}
+            onLongPress={() => onRemove?.(index)}
+            accessibilityLabel={onRemove ? t('board.wordRemoveHint', { word }) : word}
             style={[
               styles.chip,
               { backgroundColor: alpha(accent, 0.14), borderColor: alpha(accent, 0.3) },
@@ -42,21 +49,22 @@ export function WordChips({
           </Pressable>
         ))}
 
-        {adding ? (
+        {!onAdd ? null : adding ? (
           <TextInput
             value={draft}
             onChangeText={setDraft}
             onSubmitEditing={commit}
             onBlur={commit}
-            placeholder="una palabra"
+            placeholder={t('board.wordPlaceholder')}
             placeholderTextColor={color.textFaint}
             autoFocus
+            maxLength={30}
             returnKeyType="done"
             style={[styles.input, { borderColor: accent }]}
           />
         ) : (
-          <Pressable onPress={() => setAdding(true)} style={styles.add}>
-            <Text style={styles.addText}>+ palabra</Text>
+          <Pressable onPress={() => setAdding(true)} style={styles.add} accessibilityRole="button">
+            <Text style={styles.addText}>+ {t('board.wordAdd')}</Text>
           </Pressable>
         )}
       </View>
