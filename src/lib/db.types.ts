@@ -1,7 +1,7 @@
 import type { ChakraId } from '@/data/chakras';
 import type { Locale } from '@/lib/i18n';
 
-/** Row shapes, mirroring supabase/schema.sql. */
+/** Row shapes, as the backend in amplify/functions/api returns them. */
 
 export type Profile = {
   id: string;
@@ -124,5 +124,3 @@ export type Report = {
   created_at: string;
   resolved_at: string | null;
 };
-
-export const AUTHOR_FIELDS = 'id, username, display_name, avatar_path';

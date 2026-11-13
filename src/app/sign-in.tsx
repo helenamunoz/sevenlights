@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth';
 import { t } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
 
-/** Sign in with a six-digit code sent by email. There are no passwords. */
+/** Sign in with a one-time code sent by email. There are no passwords. */
 export default function SignInScreen() {
   const { sendCode, verifyCode } = useAuth();
   const [email, setEmail] = useState('');
@@ -78,10 +78,10 @@ export default function SignInScreen() {
               label={t('signIn.code')}
               value={code}
               onChangeText={setCode}
-              placeholder="123456"
+              placeholder="12345678"
               keyboardType="number-pad"
               autoComplete="one-time-code"
-              maxLength={6}
+              maxLength={8}
               style={styles.code}
               hint={t('signIn.codeHint', { email: email.trim() })}
             />

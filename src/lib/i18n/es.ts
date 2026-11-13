@@ -17,7 +17,7 @@ export const es = {
   'common.someone': 'Alguien que ya no está',
 
   'setup.missing':
-    'Falta conectar el servidor. Copiá .env.example a .env.local, completá los datos de Supabase y reiniciá la app. Los pasos están en el README.',
+    'Falta conectar el servidor. Copiá .env.example a .env.local, completá los tres valores del backend y reiniciá la app. Los pasos están en el README.',
   'setup.offline': 'No pudimos cargar tu perfil. Revisá la conexión.',
 
   'tabs.boards': 'Tableros',
@@ -28,7 +28,7 @@ export const es = {
   'signIn.tagline': 'Tableros de visión y desafíos para elevar tu frecuencia.',
   'signIn.email': 'Tu email',
   'signIn.emailPlaceholder': 'vos@ejemplo.com',
-  'signIn.emailHint': 'Te mandamos un código de seis dígitos. Sin contraseñas.',
+  'signIn.emailHint': 'Te mandamos un código de un solo uso. Sin contraseñas.',
   'signIn.sendCode': 'Enviar código',
   'signIn.sendFailed': 'No se pudo enviar el código. Revisá el email y probá de nuevo.',
   'signIn.code': 'Código',

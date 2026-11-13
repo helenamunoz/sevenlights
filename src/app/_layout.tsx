@@ -19,7 +19,7 @@ import { Button, ToastProvider } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { t } from '@/lib/i18n';
 import { persistOptions, queryClient } from '@/lib/query';
-import { isConfigured } from '@/lib/supabase';
+import { isConfigured } from '@/lib/aws';
 import { color, font, space } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();

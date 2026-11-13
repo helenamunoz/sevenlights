@@ -1,64 +1,103 @@
 # SevenLights
 
-A vision board with seven pages — one per chakra, from Raíz to Corona. Each board
-holds an intention, an affirmation, a few words, and your own photos. It works
-offline on the phone, and syncs across devices when you connect a backend.
+A free app to raise your frequency, with two tools:
 
-Built with Expo (React Native) for iOS, Android and web.
+- **Vision boards.** Seven chakra boards per person, plus as many free boards
+  as you like. Public by default, with a private switch on each. Other people
+  can like a board and borrow from it: a photo, a text, or the whole page.
+- **Challenges.** Anyone can create one, of any length. Day 1 is the day you
+  join. Each day you tick it done and can leave a note. Comments and votes;
+  the best-voted ones rise.
 
-## Run it on your phone
+Spanish and English, following the phone's language. iPhone, Android and web.
+
+## Run the app
 
 ```bash
 npm install
 npx expo start
 ```
 
-Install **Expo Go** from the App Store, open the camera, scan the QR code in the
-terminal. The app loads on your phone — no Apple developer account needed.
+Scan the QR code with **Expo Go** on the iPhone. The repo's `.env` already
+points at the deployed backend (three public values; no secrets).
 
-To keep it on the home screen as a standalone app, build with EAS:
+Optional: put the app's Instagram profile in `.env` as
+`EXPO_PUBLIC_INSTAGRAM_URL=https://www.instagram.com/...` to show the
+"follow us" link on the profile tab.
+
+## The backend
+
+Everything is on AWS, defined in `amplify/` with Amplify Gen 2, and all of it
+is pay-per-use — nothing runs while nobody is using the app:
+
+| Piece | Service | What it costs |
+| --- | --- | --- |
+| Sign-in by emailed code | Cognito (Essentials plan) | Free up to 10,000 monthly active users |
+| API | AppSync | $4 per million requests |
+| All the rules | Lambda (one function, plus a tiny sign-up helper) | Free up to 1 million requests a month |
+| Data | DynamoDB, one on-demand table | About $1.25 per million writes, $0.25 per million reads; 25 GB free |
+| Photos, avatars, audio | S3, one private bucket | About $0.023 per GB a month |
+
+For one person and a handful of friends this is **$0 to a few cents a month**.
+
+### Deploy
+
+You need Node 22 and AWS credentials for the account in your environment
+(`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`), with `AWS_REGION=us-east-1`.
 
 ```bash
-npx eas build --profile development --platform ios
+npm run backend                 # npx ampx sandbox --once --identifier main
+node scripts/write-env.mjs      # copies the three public values into .env
+npm run seed                    # the suggested breathing challenge, es + en
 ```
 
-That step needs an Apple account. A free one signs builds that expire after
-7 days; a paid Developer account ($99/yr) signs builds that stay installed.
+`npm run backend` is safe to run again after changing anything in `amplify/`;
+it updates what is there and keeps the data. It writes `amplify_outputs.json`
+(not committed) for the scripts and tests.
 
-## Sync (optional)
+This is an Amplify *sandbox* deployment: the simplest kind, with no build
+pipeline and no hosting bill. Be careful with one command:
+`npx ampx sandbox delete` removes the whole backend **including everyone's
+data**.
 
-Without the two environment variables below the app is a local notebook: fast,
-private, no accounts. Add them and your boards follow you between devices.
+### Make yourself an admin
 
-1. Create a project at [supabase.com](https://supabase.com) (free tier is plenty).
-2. Open **SQL Editor → New query**, paste `supabase/schema.sql`, run it. That
-   creates the tables, the row level security policies, and the private photo
-   bucket.
-3. Copy the API details into a local env file:
+Admins can hide reported boards, challenges, comments and notes from the app
+(Profile → Moderation). Sign in to the app once, then, with AWS credentials:
 
-   ```bash
-   cp .env.example .env.local
-   ```
+```bash
+aws cognito-idp admin-add-user-to-group \
+  --user-pool-id "$(node -p "require('./amplify_outputs.json').auth.user_pool_id")" \
+  --username you@example.com --group-name admins
+```
 
-   Fill in `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from
-   **Project Settings → API**.
-4. Restart `npx expo start`, open **Sincronización** in the app, and sign in with
-   your email — Supabase sends a six-digit code.
+Or in the AWS console: Cognito → User pools → the SevenLights pool → Groups →
+`admins` → Add user. Then sign out of the app and back in. Nobody can do this
+from inside the app.
 
-The anon key is safe in a public repo: it can only do what the policies in
-`schema.sql` allow, which is "read and write rows that belong to the signed-in
-user". The `service_role` key is not, and never belongs in this project.
+### Email limits
 
-## How the data works
+Sign-in codes are sent by Cognito's built-in sender, which allows roughly 50
+emails a day. That is plenty for testing with friends. A public launch needs
+Amazon SES with production access, configured as the pool's sender.
 
-- Every edit saves locally first, then pushes about a second later.
-- Boards merge last-write-wins: the most recently edited version of a board wins
-  whole. Photos merge additively, since each one has its own id.
-- Photos are copied into the app's storage when you pick them, uploaded to a
-  private bucket, and downloaded on your other devices through signed URLs.
+## Checks
 
-## Layout
+```bash
+npm run typecheck        # the app and the backend
+npm test                 # day and streak maths
+npm run test:backend     # the rules, against the deployed backend
+npx expo export -p web && node tests/e2e/web.mjs   # browser walk-through
+```
 
-`src/app` holds the routes, `src/lib` the state and sync, `src/components` the
-pieces of a board, `src/data/chakras.ts` the seven centers themselves. Working
-notes and open tasks are in `CLAUDE.md`.
+`test:backend` creates three throwaway people and proves, against the real
+backend, that private boards and their photos stay private, nobody can make
+themselves an admin or forge a counter, blocks hide both ways, each
+missed-day rule accepts only the days it should, votes move the rank, hidden
+content disappears for others, and deleting an account removes its content
+while challenge members keep their progress. It removes what it creates.
+
+## How it is built
+
+Working notes for whoever (or whatever) works on the code next are in
+`CLAUDE.md`.

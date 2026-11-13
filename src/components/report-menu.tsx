@@ -3,11 +3,10 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { ActionSheet, Sheet, type Action } from '@/components/sheet';
 import { Button, Input, useToast } from '@/components/ui';
-import { useReport, useSetBlocked } from '@/lib/api/social';
+import { useAdminHide, useReport, useSetBlocked } from '@/lib/api/social';
 import { useAuth } from '@/lib/auth';
 import type { ReportTarget } from '@/lib/db.types';
 import { t } from '@/lib/i18n';
-import { supabase } from '@/lib/supabase';
 import { color, font, space } from '@/theme/tokens';
 
 /**
@@ -30,6 +29,7 @@ export function ReportMenu({
   const toast = useToast();
   const report = useReport();
   const setBlocked = useSetBlocked();
+  const hide = useAdminHide();
   const [open, setOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [confirmingBlock, setConfirmingBlock] = useState(false);
@@ -47,10 +47,11 @@ export function ReportMenu({
     actions.push({
       label: t('report.hide'),
       destructive: true,
-      onPress: async () => {
-        const { error } = await supabase.rpc('admin_set_hidden', { p_type: type, p_id: id, p_hidden: true });
-        toast(error ? t('common.failed') : t('report.hidden'));
-      },
+      onPress: () =>
+        hide.mutate(
+          { type, id },
+          { onSuccess: () => toast(t('report.hidden')), onError: () => toast(t('common.failed')) }
+        ),
     });
   }
   if (actions.length === 0) return null;

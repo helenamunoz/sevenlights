@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ChakraId } from '@/data/chakras';
 import { useMe } from '@/lib/auth';
 import { localDate, progress, type Progress } from '@/lib/days';
+import { read, write } from '@/lib/aws';
 import {
-  AUTHOR_FIELDS,
   type Challenge,
   type ChallengeDay,
   type Checkin,
@@ -13,10 +13,7 @@ import {
   type MissedRule,
 } from '@/lib/db.types';
 import { locale, type Locale } from '@/lib/i18n';
-import { newId, uploadFile } from '@/lib/media';
-import { supabase } from '@/lib/supabase';
-
-const CHALLENGE = `*, creator:profiles(${AUTHOR_FIELDS})`;
+import { uploadAudio } from '@/lib/media';
 
 // ── reading ──────────────────────────────────────────────────────────
 
@@ -26,16 +23,7 @@ export type ChallengeSort = 'top' | 'new';
 export function useChallenges(sort: ChallengeSort, language: Locale | 'all') {
   return useQuery({
     queryKey: ['challenges', sort, language],
-    queryFn: async () => {
-      let query = supabase.from('challenges').select(CHALLENGE).eq('is_official', false);
-      if (language !== 'all') query = query.eq('locale', language);
-      if (sort === 'top') {
-        query = query.order('rank', { ascending: false }).order('member_count', { ascending: false });
-      }
-      const { data, error } = await query.order('created_at', { ascending: false }).limit(60);
-      if (error) throw error;
-      return data as Challenge[];
-    },
+    queryFn: () => read<Challenge[]>('challenges', { sort, language }),
   });
 }
 
@@ -43,16 +31,7 @@ export function useChallenges(sort: ChallengeSort, language: Locale | 'all') {
 export function useSuggestedChallenges() {
   return useQuery({
     queryKey: ['challenges', 'suggested', locale],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('challenges')
-        .select('*')
-        .eq('is_official', true)
-        .eq('locale', locale)
-        .order('created_at');
-      if (error) throw error;
-      return data as Challenge[];
-    },
+    queryFn: () => read<Challenge[]>('suggestedChallenges', { locale }),
   });
 }
 
@@ -60,11 +39,7 @@ export function useChallenge(id: string | undefined) {
   return useQuery({
     queryKey: ['challenge', id],
     enabled: Boolean(id),
-    queryFn: async () => {
-      const { data, error } = await supabase.from('challenges').select(CHALLENGE).eq('id', id!).maybeSingle();
-      if (error) throw error;
-      return data as Challenge | null;
-    },
+    queryFn: () => read<Challenge | null>('challenge', { id }),
   });
 }
 
@@ -72,15 +47,7 @@ export function useChallengeDays(id: string | undefined) {
   return useQuery({
     queryKey: ['challenge-days', id],
     enabled: Boolean(id),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('challenge_days')
-        .select('*')
-        .eq('challenge_id', id!)
-        .order('day_number');
-      if (error) throw error;
-      return data as ChallengeDay[];
-    },
+    queryFn: () => read<ChallengeDay[]>('challengeDays', { id }),
   });
 }
 
@@ -91,15 +58,7 @@ export function useMemberships() {
   const me = useMe();
   return useQuery({
     queryKey: ['memberships', me],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('challenge_members')
-        .select('*, challenge:challenges(*)')
-        .eq('user_id', me)
-        .order('joined_at', { ascending: false });
-      if (error) throw error;
-      return (data as Joined[]).filter((row) => row.challenge);
-    },
+    queryFn: () => read<Joined[]>('myMemberships'),
   });
 }
 
@@ -108,11 +67,7 @@ export function useMyCheckins() {
   const me = useMe();
   return useQuery({
     queryKey: ['checkins', me],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('checkins').select('*').eq('user_id', me);
-      if (error) throw error;
-      return data as Checkin[];
-    },
+    queryFn: () => read<Checkin[]>('myCheckins'),
   });
 }
 
@@ -141,19 +96,7 @@ export function useSharedNotes(challengeId: string | undefined) {
   return useQuery({
     queryKey: ['notes', challengeId],
     enabled: Boolean(challengeId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('checkins')
-        .select(`*, author:profiles(${AUTHOR_FIELDS})`)
-        .eq('challenge_id', challengeId!)
-        .eq('note_public', true)
-        .neq('note', '')
-        .is('hidden_at', null)
-        .order('done_at', { ascending: false })
-        .limit(40);
-      if (error) throw error;
-      return data as Checkin[];
-    },
+    queryFn: () => read<Checkin[]>('sharedNotes', { challengeId }),
   });
 }
 
@@ -161,17 +104,9 @@ export function useComments(challengeId: string | undefined) {
   return useQuery({
     queryKey: ['comments', challengeId],
     enabled: Boolean(challengeId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('comments')
-        .select(`*, author:profiles(${AUTHOR_FIELDS})`)
-        .eq('challenge_id', challengeId!)
-        .is('hidden_at', null)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      return data as Comment[];
-    },
+    // The backend also returns the caller's own comments an admin has hidden.
+    queryFn: async () =>
+      (await read<Comment[]>('comments', { challengeId })).filter((comment) => !comment.hidden_at),
   });
 }
 
@@ -180,13 +115,7 @@ export function useMyVotes() {
   const me = useMe();
   return useQuery({
     queryKey: ['votes', me],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('challenge_votes').select('challenge_id, value').eq('user_id', me);
-      if (error) throw error;
-      return Object.fromEntries(
-        (data as { challenge_id: string; value: number }[]).map((v) => [v.challenge_id, v.value])
-      ) as Record<string, number>;
-    },
+    queryFn: () => read<Record<string, number>>('myVotes'),
   });
 }
 
@@ -196,12 +125,7 @@ export function useJoin() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (challengeId: string) => {
-      const { error } = await supabase
-        .from('challenge_members')
-        .insert({ challenge_id: challengeId, user_id: me, start_date: localDate() });
-      if (error) throw error;
-    },
+    mutationFn: (challengeId: string) => write('join', { challengeId, start_date: localDate() }),
     onSettled: (_data, _error, challengeId) => {
       client.invalidateQueries({ queryKey: ['memberships', me] });
       client.invalidateQueries({ queryKey: ['challenge', challengeId] });
@@ -213,14 +137,7 @@ export function useLeave() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (challengeId: string) => {
-      const { error } = await supabase
-        .from('challenge_members')
-        .delete()
-        .eq('challenge_id', challengeId)
-        .eq('user_id', me);
-      if (error) throw error;
-    },
+    mutationFn: (challengeId: string) => write('leave', { challengeId }),
     onSettled: (_data, _error, challengeId) => {
       client.invalidateQueries({ queryKey: ['memberships', me] });
       client.invalidateQueries({ queryKey: ['checkins', me] });
@@ -235,13 +152,7 @@ export function useRestart() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (challengeId: string) => {
-      const { error } = await supabase.rpc('restart_challenge', {
-        p_challenge: challengeId,
-        p_start: localDate(),
-      });
-      if (error) throw error;
-    },
+    mutationFn: (challengeId: string) => write('restart', { challengeId, start_date: localDate() }),
     onSettled: (_data, _error, challengeId) => {
       client.invalidateQueries({ queryKey: ['memberships', me] });
       client.invalidateQueries({ queryKey: ['checkins', me] });
@@ -254,14 +165,7 @@ export function useSetReminder() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ challengeId, time }: { challengeId: string; time: string | null }) => {
-      const { error } = await supabase
-        .from('challenge_members')
-        .update({ reminder_time: time })
-        .eq('challenge_id', challengeId)
-        .eq('user_id', me);
-      if (error) throw error;
-    },
+    mutationFn: (input: { challengeId: string; time: string | null }) => write('setReminder', input),
     onSettled: () => client.invalidateQueries({ queryKey: ['memberships', me] }),
   });
 }
@@ -270,17 +174,8 @@ export function useCheckIn() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { challengeId: string; day: number; note: string; notePublic: boolean }) => {
-      const { error } = await supabase.from('checkins').insert({
-        challenge_id: input.challengeId,
-        user_id: me,
-        day_number: input.day,
-        local_date: localDate(),
-        note: input.note,
-        note_public: input.notePublic,
-      });
-      if (error) throw error;
-    },
+    mutationFn: (input: { challengeId: string; day: number; note: string; notePublic: boolean }) =>
+      write('checkIn', { ...input, local_date: localDate() }),
     // Ticking a day should feel instant, even on a slow connection.
     onMutate: async (input) => {
       await client.cancelQueries({ queryKey: ['checkins', me] });
@@ -311,15 +206,8 @@ export function useUpdateNote() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { challengeId: string; day: number; note: string; notePublic: boolean }) => {
-      const { error } = await supabase
-        .from('checkins')
-        .update({ note: input.note, note_public: input.notePublic })
-        .eq('challenge_id', input.challengeId)
-        .eq('user_id', me)
-        .eq('day_number', input.day);
-      if (error) throw error;
-    },
+    mutationFn: (input: { challengeId: string; day: number; note: string; notePublic: boolean }) =>
+      write('updateNote', input),
     onSettled: (_data, _error, input) => {
       client.invalidateQueries({ queryKey: ['checkins', me] });
       client.invalidateQueries({ queryKey: ['notes', input.challengeId] });
@@ -331,15 +219,7 @@ export function useUndoCheckIn() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ challengeId, day }: { challengeId: string; day: number }) => {
-      const { error } = await supabase
-        .from('checkins')
-        .delete()
-        .eq('challenge_id', challengeId)
-        .eq('user_id', me)
-        .eq('day_number', day);
-      if (error) throw error;
-    },
+    mutationFn: (input: { challengeId: string; day: number }) => write('undoCheckIn', input),
     onSettled: (_data, _error, { challengeId }) => {
       client.invalidateQueries({ queryKey: ['checkins', me] });
       client.invalidateQueries({ queryKey: ['notes', challengeId] });
@@ -352,14 +232,7 @@ export function useVote() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ challengeId, value }: { challengeId: string; value: number }) => {
-      const votes = supabase.from('challenge_votes');
-      const { error } =
-        value === 0
-          ? await votes.delete().eq('challenge_id', challengeId).eq('user_id', me)
-          : await votes.upsert({ challenge_id: challengeId, user_id: me, value });
-      if (error) throw error;
-    },
+    mutationFn: (input: { challengeId: string; value: number }) => write('vote', input),
     onMutate: async ({ challengeId, value }) => {
       await client.cancelQueries({ queryKey: ['votes', me] });
       const before = client.getQueryData<Record<string, number>>(['votes', me]) ?? {};
@@ -395,12 +268,7 @@ export function useAddComment() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ challengeId, body }: { challengeId: string; body: string }) => {
-      const { error } = await supabase
-        .from('comments')
-        .insert({ challenge_id: challengeId, user_id: me, body });
-      if (error) throw error;
-    },
+    mutationFn: (input: { challengeId: string; body: string }) => write('addComment', input),
     onSettled: (_data, _error, { challengeId }) => {
       client.invalidateQueries({ queryKey: ['comments', challengeId] });
       client.invalidateQueries({ queryKey: ['challenge', challengeId] });
@@ -411,10 +279,7 @@ export function useAddComment() {
 export function useDeleteComment() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (comment: Comment) => {
-      const { error } = await supabase.from('comments').delete().eq('id', comment.id);
-      if (error) throw error;
-    },
+    mutationFn: (comment: Comment) => write('deleteComment', { id: comment.id }),
     onSettled: (_data, _error, comment) => {
       client.invalidateQueries({ queryKey: ['comments', comment.challenge_id] });
       client.invalidateQueries({ queryKey: ['challenge', comment.challenge_id] });
@@ -445,32 +310,9 @@ export function useCreateChallenge() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async ({ audio, days, ...fields }: NewChallenge) => {
-      let audio_path: string | null = null;
-      if (audio) {
-        const extension = /\.([a-z0-9]{2,4})$/i.exec(audio.name)?.[1]?.toLowerCase() ?? 'm4a';
-        audio_path = `${me}/audio/${newId()}.${extension}`;
-        await uploadFile(audio.uri, audio_path, audio.mimeType);
-      }
-      const { data, error } = await supabase
-        .from('challenges')
-        .insert({ creator_id: me, audio_path, ...fields })
-        .select('id')
-        .single();
-      if (error) throw error;
-      const id = (data as { id: string }).id;
-
-      const texts = days.filter((day) => day.body.trim() !== '');
-      if (texts.length) {
-        const { error: daysError } = await supabase
-          .from('challenge_days')
-          .insert(texts.map((day) => ({ challenge_id: id, ...day })));
-        if (daysError) throw daysError;
-      }
-      await supabase
-        .from('challenge_members')
-        .insert({ challenge_id: id, user_id: me, start_date: localDate() });
-      return id;
+    mutationFn: async ({ audio, ...fields }: NewChallenge) => {
+      const audio_path = audio ? await uploadAudio(audio.uri, audio.name, audio.mimeType) : null;
+      return write<string>('createChallenge', { ...fields, audio_path, start_date: localDate() });
     },
     onSettled: () => {
       client.invalidateQueries({ queryKey: ['challenges'] });
@@ -483,13 +325,8 @@ export function useDeleteChallenge() {
   const me = useMe();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: async (challengeId: string) => {
-      // Row level security refuses this once other people have joined, and a
-      // refused delete is not an error — it just removes nothing.
-      const { data, error } = await supabase.from('challenges').delete().eq('id', challengeId).select('id');
-      if (error) throw error;
-      if (!data?.length) throw new Error('has-members');
-    },
+    // Refused with "has-members" once other people have joined.
+    mutationFn: (challengeId: string) => write('deleteChallenge', { id: challengeId }),
     onSettled: () => {
       client.invalidateQueries({ queryKey: ['challenges'] });
       client.invalidateQueries({ queryKey: ['memberships', me] });

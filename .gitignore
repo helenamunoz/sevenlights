@@ -44,3 +44,7 @@ example
 
 # local
 _stash/
+
+# Amplify backend build output
+.amplify/
+amplify_outputs*

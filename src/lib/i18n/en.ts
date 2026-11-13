@@ -16,7 +16,7 @@ export const en: Record<keyof typeof es, string> = {
   'common.someone': 'Someone who has left',
 
   'setup.missing':
-    'The server isn’t connected yet. Copy .env.example to .env.local, fill in the Supabase details and restart the app. The steps are in the README.',
+    'The server isn’t connected yet. Copy .env.example to .env.local, fill in the three backend values and restart the app. The steps are in the README.',
   'setup.offline': 'We couldn’t load your profile. Check your connection.',
 
   'tabs.boards': 'Boards',
@@ -27,7 +27,7 @@ export const en: Record<keyof typeof es, string> = {
   'signIn.tagline': 'Vision boards and challenges to raise your frequency.',
   'signIn.email': 'Your email',
   'signIn.emailPlaceholder': 'you@example.com',
-  'signIn.emailHint': 'We’ll send you a six-digit code. No passwords.',
+  'signIn.emailHint': 'We’ll send you a one-time code. No passwords.',
   'signIn.sendCode': 'Send code',
   'signIn.sendFailed': 'Couldn’t send the code. Check the email and try again.',
   'signIn.code': 'Code',

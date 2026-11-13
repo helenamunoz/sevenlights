@@ -1,10 +1,10 @@
-import type { Session } from '@supabase/supabase-js';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
+import * as aws from '@/lib/aws';
+import type { Session } from '@/lib/aws';
 import type { Profile } from '@/lib/db.types';
 import { queryClient } from '@/lib/query';
-import { supabase } from '@/lib/supabase';
 
 type Auth = {
   /** False until the stored session has been read. */
@@ -17,6 +17,7 @@ type Auth = {
   /** The profile could not be fetched and none is cached — not the same as having none. */
   profileFailed: boolean;
   retryProfile: () => void;
+  /** In the `admins` group. Only decides what is shown; the backend checks again. */
   isAdmin: boolean;
   sendCode: (email: string) => Promise<void>;
   verifyCode: (email: string, code: string) => Promise<void>;
@@ -31,33 +32,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const userId = session?.user.id ?? null;
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    aws.getSession().then((stored) => {
+      setSession(stored);
       setReady(true);
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
-    return () => data.subscription.unsubscribe();
+    return aws.onSessionChange(setSession);
   }, []);
 
   const profile = useQuery({
     queryKey: ['profile', userId],
     enabled: userId !== null,
-    queryFn: async () => {
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId!).maybeSingle();
-      if (error) throw error;
-      return data as Profile | null;
-    },
-  });
-
-  const admin = useQuery({
-    queryKey: ['is-admin', userId],
-    enabled: userId !== null,
-    staleTime: Infinity,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('is_admin');
-      if (error) throw error;
-      return data === true;
-    },
+    queryFn: async () => (await aws.read<{ profile: Profile | null }>('me')).profile,
   });
 
   const value: Auth = {
@@ -68,17 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profileLoading: userId !== null && profile.isPending,
     profileFailed: profile.isError && profile.data === undefined,
     retryProfile: () => void profile.refetch(),
-    isAdmin: admin.data === true,
-    sendCode: async (email) => {
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) throw error;
-    },
-    verifyCode: async (email, code) => {
-      const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
-      if (error) throw error;
-    },
+    isAdmin: session?.isAdmin === true,
+    sendCode: aws.sendCode,
+    verifyCode: aws.verifyCode,
     signOut: async () => {
-      await supabase.auth.signOut();
+      await aws.signOut();
       // The next person on this phone must not see the last one's cache.
       queryClient.clear();
     },
