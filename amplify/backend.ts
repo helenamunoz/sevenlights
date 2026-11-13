@@ -1,5 +1,12 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
+import {
+  Distribution,
+  HttpVersion,
+  PriceClass,
+  ViewerProtocolPolicy,
+} from 'aws-cdk-lib/aws-cloudfront';
+import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
@@ -60,10 +67,46 @@ fn.addToRolePolicy(
 backend.api.addEnvironment('TABLE_NAME', table.tableName);
 backend.api.addEnvironment('BUCKET_NAME', bucket.bucketName);
 
+// ── the web app ──────────────────────────────────────────────────────
+// The exported web build (scripts/deploy-web.mjs uploads it) in a private
+// bucket that only CloudFront can read. CloudFront gives it an https address;
+// there is no custom domain. Both are pay-per-use, with a free tier that a
+// small app stays inside.
+const webStack = backend.createStack('web');
+const webBucket = new Bucket(webStack, 'WebBucket', {
+  blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+  encryption: BucketEncryption.S3_MANAGED,
+  enforceSSL: true,
+  // Nothing here is data: it can always be rebuilt from the repo.
+  removalPolicy: RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+});
+const web = new Distribution(webStack, 'WebDistribution', {
+  defaultBehavior: {
+    origin: S3BucketOrigin.withOriginAccessControl(webBucket),
+    viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    compress: true,
+  },
+  defaultRootObject: 'index.html',
+  // A single-page app: every unknown path is the app itself.
+  errorResponses: [403, 404].map((httpStatus) => ({
+    httpStatus,
+    responseHttpStatus: 200,
+    responsePagePath: '/index.html',
+    ttl: Duration.seconds(0),
+  })),
+  // North America and Europe only: the cheapest class.
+  priceClass: PriceClass.PRICE_CLASS_100,
+  httpVersion: HttpVersion.HTTP2_AND_3,
+});
+
 backend.addOutput({
   custom: {
     tableName: table.tableName,
     bucketName: bucket.bucketName,
     apiFunctionName: fn.functionName,
+    webBucketName: webBucket.bucketName,
+    webDistributionId: web.distributionId,
+    webUrl: `https://${web.distributionDomainName}`,
   },
 });

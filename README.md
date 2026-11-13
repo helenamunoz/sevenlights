@@ -21,7 +21,11 @@ npx expo start
 Scan the QR code with **Expo Go** on the iPhone. The repo's `.env` already
 points at the deployed backend (three public values; no secrets).
 
-To try it in a browser instead:
+The web app is live at **https://d1seiplrwjzc1j.cloudfront.net** — same
+accounts and data as the phone app. After changing the app, publish the new
+version with `npm run web:deploy` (needs AWS credentials).
+
+To try a local build in a browser instead:
 
 ```bash
 npm run web:preview      # builds the web app and serves it on http://localhost:8080
@@ -43,6 +47,7 @@ is pay-per-use — nothing runs while nobody is using the app:
 | All the rules | Lambda (one function, plus a tiny sign-up helper) | Free up to 1 million requests a month |
 | Data | DynamoDB, one on-demand table | About $1.25 per million writes, $0.25 per million reads; 25 GB free |
 | Photos, avatars, audio | S3, one private bucket | About $0.023 per GB a month |
+| The web app | S3 bucket behind CloudFront (no custom domain) | Free up to 1 TB and 10 million requests a month |
 
 For one person and a handful of friends this is **$0 to a few cents a month**.
 

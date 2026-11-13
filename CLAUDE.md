@@ -11,7 +11,8 @@ also runs on Android and web.
 - **Account required.** Sign-in is an emailed one-time code; there are no passwords.
 - **The backend is AWS, defined in `amplify/` (Amplify Gen 2).** Cognito for
   sign-in, AppSync in front of one Lambda function, one DynamoDB table, one
-  private S3 bucket. All pay-per-use. Do not add anything that costs money
+  private S3 bucket. The web build is hosted on S3 behind CloudFront
+  (https://d1seiplrwjzc1j.cloudfront.net). All pay-per-use. Do not add anything that costs money
   while idle (RDS, NAT gateways, provisioned capacity, OpenSearch, WAF, custom
   domains) and tell Helena before creating anything that could cost more than
   cents a month.
@@ -29,7 +30,7 @@ also runs on Android and web.
 ## Where things live
 
 ```
-amplify/backend.ts                 table, bucket, permissions
+amplify/backend.ts                 table, bucket, permissions, web hosting
 amplify/auth/resource.ts           Cognito: email code sign-in, `admins` group
 amplify/data/resource.ts           the two GraphQL fields, read and write
 amplify/functions/api/handler.ts   every operation and who may do it
@@ -75,6 +76,7 @@ npm run typecheck         # app and backend
 npm test                  # day maths
 npm run test:backend      # rules, against the deployed sandbox
 npx expo export -p web && node tests/e2e/web.mjs
+npm run web:deploy        # publish the web app to its CloudFront address
 ```
 
 The backend commands need AWS credentials in the environment and
