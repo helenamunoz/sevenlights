@@ -20,7 +20,7 @@ const { chromium } = createRequire(import.meta.url)('playwright');
 const shots = resolve(process.argv[2] ?? 'tests/e2e/screenshots');
 mkdirSync(shots, { recursive: true });
 const dist = resolve('dist');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.ico': 'image/x-icon', '.ttf': 'font/ttf' };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.ico': 'image/x-icon', '.ttf': 'font/ttf' };
 
 const server = createServer((request, response) => {
   const path = join(dist, decodeURIComponent(new URL(request.url, 'http://x').pathname));
@@ -170,7 +170,7 @@ try {
     await page.goto(base);
     await page.getByText('Siete Luces').waitFor({ timeout: 20_000 });
     await page.getByText('Desafíos', { exact: true }).last().click();
-    await page.getByText('Sugeridos por SevenLights').waitFor({ timeout: 20_000 });
+    await page.getByText('Sugeridos por 7Lights').waitFor({ timeout: 20_000 });
     await page.locator(`[aria-label="${challengeTitle}"]`).first().waitFor({ timeout: 20_000 });
     await shot('11-challenges');
     await page.locator('[aria-label="5 minutos de respiración consciente"]').first().click();

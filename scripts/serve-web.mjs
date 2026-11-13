@@ -13,6 +13,7 @@ const TYPES = {
   '.css': 'text/css',
   '.json': 'application/json',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.ico': 'image/x-icon',
   '.ttf': 'font/ttf',
   '.svg': 'image/svg+xml',
@@ -23,4 +24,4 @@ createServer((request, response) => {
   const file = path.startsWith(root) && existsSync(path) && statSync(path).isFile() ? path : join(root, 'index.html');
   response.writeHead(200, { 'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream' });
   createReadStream(file).pipe(response);
-}).listen(port, () => console.log(`SevenLights web build on http://localhost:${port}`));
+}).listen(port, () => console.log(`7Lights web build on http://localhost:${port}`));

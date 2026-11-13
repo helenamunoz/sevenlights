@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { lightColor } from '@/data/chakras';
+import { CoverArt } from '@/components/brand';
+import { challengeColor, challengeCover } from '@/data/brand';
 import type { Progress } from '@/lib/days';
 import type { Challenge } from '@/lib/db.types';
 import { t } from '@/lib/i18n';
@@ -20,7 +21,8 @@ export function challengeFacts(challenge: Challenge): string {
 /** A challenge in a list. With `progress` it also shows how far the person is. */
 export function ChallengeCard({ challenge, progress }: { challenge: Challenge; progress?: Progress | null }) {
   const router = useRouter();
-  const accent = lightColor(challenge.light);
+  const accent = challengeColor(challenge);
+  const cover = challengeCover(challenge);
   const score = challenge.up_count - challenge.down_count;
 
   return (
@@ -29,10 +31,11 @@ export function ChallengeCard({ challenge, progress }: { challenge: Challenge; p
       accessibilityRole="button"
       accessibilityLabel={challenge.title}
       style={({ pressed }) => [styles.card, { borderColor: alpha(accent, 0.28) }, pressed && styles.pressed]}>
+      {!progress ? <CoverArt source={cover} style={styles.cover} /> : null}
       <View style={styles.top}>
         <View style={[styles.dot, { backgroundColor: accent }]} />
         <Text style={styles.facts}>{challengeFacts(challenge)}</Text>
-        {challenge.is_official ? <Text style={[styles.badge, { color: accent }]}>{t('challenge.suggested')}</Text> : null}
+        {challenge.is_official ? <Text style={styles.badge}>{t('challenge.suggested')}</Text> : null}
         {!challenge.is_official && score !== 0 ? (
           <Text style={styles.score}>
             {score > 0 ? '▲' : '▼'} {Math.abs(score)}
@@ -82,6 +85,7 @@ const styles = StyleSheet.create({
     gap: space.sm,
   },
   pressed: { opacity: 0.8 },
+  cover: { width: '100%', height: 108 },
   top: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   dot: { width: 9, height: 9, borderRadius: 5 },
   facts: {
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: color.textFaint,
   },
-  badge: { fontFamily: font.bodyBold, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' },
+  badge: { fontFamily: font.bodyBold, fontSize: 11, letterSpacing: 1, color: color.textSoft, textTransform: 'uppercase' },
   score: { fontFamily: font.bodyMedium, fontSize: 12, color: color.textSoft },
   title: { fontFamily: font.display, fontSize: 23, lineHeight: 29, color: color.text },
   description: { fontFamily: font.body, fontSize: 14, lineHeight: 21, color: color.textSoft },

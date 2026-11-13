@@ -230,6 +230,7 @@ export function Toggle({
     <Pressable
       onPress={() => onChange(!value)}
       accessibilityRole="switch"
+      aria-checked={value}
       accessibilityState={{ checked: value }}
       accessibilityLabel={label}
       style={styles.toggle}>

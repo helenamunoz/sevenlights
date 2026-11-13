@@ -1,12 +1,12 @@
-import {
-  Fraunces_300Light,
-  Fraunces_300Light_Italic,
-  Fraunces_600SemiBold,
-  useFonts,
-} from '@expo-google-fonts/fraunces';
-import { Karla_400Regular, Karla_500Medium, Karla_700Bold } from '@expo-google-fonts/karla';
-import { NotoSerifDevanagari_400Regular } from '@expo-google-fonts/noto-serif-devanagari';
+import { BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque/700Bold';
+import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque/800ExtraBold';
+import { InstrumentSans_400Regular } from '@expo-google-fonts/instrument-sans/400Regular';
+import { InstrumentSans_400Regular_Italic } from '@expo-google-fonts/instrument-sans/400Regular_Italic';
+import { InstrumentSans_500Medium } from '@expo-google-fonts/instrument-sans/500Medium';
+import { InstrumentSans_700Bold } from '@expo-google-fonts/instrument-sans/700Bold';
+import { NotoSerifDevanagari_400Regular } from '@expo-google-fonts/noto-serif-devanagari/400Regular';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { BrandLockup } from '@/components/brand';
 import { ReminderSync } from '@/components/reminder-sync';
 import { Button, ToastProvider } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/lib/auth';
@@ -26,12 +27,12 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Fraunces_300Light,
-    Fraunces_300Light_Italic,
-    Fraunces_600SemiBold,
-    Karla_400Regular,
-    Karla_500Medium,
-    Karla_700Bold,
+    BricolageGrotesque_700Bold,
+    BricolageGrotesque_800ExtraBold,
+    InstrumentSans_400Regular,
+    InstrumentSans_400Regular_Italic,
+    InstrumentSans_500Medium,
+    InstrumentSans_700Bold,
     NotoSerifDevanagari_400Regular,
   });
 
@@ -44,7 +45,7 @@ export default function RootLayout() {
   if (!isConfigured) {
     return (
       <View style={styles.notice}>
-        <Text style={styles.noticeTitle}>SevenLights</Text>
+        <BrandLockup />
         <Text style={styles.noticeBody}>{t('setup.missing')}</Text>
       </View>
     );
@@ -127,7 +128,6 @@ const styles = StyleSheet.create({
     padding: space.xl,
     gap: space.lg,
   },
-  noticeTitle: { fontFamily: font.display, fontSize: 40, color: color.text },
   noticeBody: {
     fontFamily: font.body,
     fontSize: 15,

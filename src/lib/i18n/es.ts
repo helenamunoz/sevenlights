@@ -41,7 +41,7 @@ export const es = {
   'onboarding.title': '¿Cómo te llamamos?',
   'onboarding.publicTitle': 'Tus tableros se comparten',
   'onboarding.publicBody':
-    'Lo que pongas en un tablero lo puede ver cualquier persona de SevenLights, y puede tomar ideas para el suyo. Cada tablero tiene un interruptor para dejarlo privado cuando quieras.',
+    'Lo que pongas en un tablero lo puede ver cualquier persona de 7Lights, y puede tomar ideas para el suyo. Cada tablero tiene un interruptor para dejarlo privado cuando quieras.',
   'onboarding.accept': 'Leí y acepto las normas de la comunidad',
   'onboarding.start': 'Empezar',
 
@@ -100,7 +100,7 @@ export const es = {
   'photos.uploading': 'subiendo…',
   'photos.fromLibrary': 'Elegir de la galería',
   'photos.fromCamera': 'Sacar una foto',
-  'photos.noPermission': 'SevenLights necesita permiso para ver tus fotos. Se cambia en Ajustes.',
+  'photos.noPermission': '7Lights necesita permiso para ver tus fotos. Se cambia en Ajustes.',
   'photos.failed': 'No se pudo subir la imagen.',
   'photos.captionPlaceholder': 'Una línea sobre esta imagen',
   'photos.remove': 'Quitar del tablero',
@@ -122,7 +122,7 @@ export const es = {
   'challenges.eyebrow': 'Práctica diaria',
   'challenges.title': 'Desafíos',
   'challenges.mine': 'Los que estás haciendo',
-  'challenges.suggested': 'Sugeridos por SevenLights',
+  'challenges.suggested': 'Sugeridos por 7Lights',
   'challenges.community': 'De la comunidad',
   'challenges.top': 'Más votados',
   'challenges.new': 'Nuevos',
@@ -135,7 +135,7 @@ export const es = {
   'challenge.minutes': '{n} min',
   'challenge.members': '{n} personas',
   'challenge.suggested': 'Sugerido',
-  'challenge.byApp': 'Sugerido por SevenLights',
+  'challenge.byApp': 'Sugerido por 7Lights',
   'challenge.day': 'Día {n}',
   'challenge.dayOf': 'Día {day} de {total}',
   'challenge.doneToday': 'Hoy ya está hecho',
@@ -201,7 +201,7 @@ export const es = {
   'reminder.off': 'Sin recordatorio',
   'reminder.title': '¿A qué hora te avisamos?',
   'reminder.body': 'Tu práctica de hoy te espera.',
-  'reminder.denied': 'Las notificaciones están apagadas para SevenLights. Se prenden en Ajustes.',
+  'reminder.denied': 'Las notificaciones están apagadas para 7Lights. Se prenden en Ajustes.',
 
   'comments.title': 'Comentarios',
   'comments.placeholder': 'Dejá un comentario',
@@ -284,7 +284,7 @@ export const es = {
   'legal.title': 'Normas y privacidad',
   'legal.rulesTitle': 'Normas de la comunidad',
   'legal.rules':
-    'SevenLights es un lugar para inspirarse. Compartí solo lo que es tuyo o tenés permiso de compartir. No hay lugar para el acoso, el odio, el contenido sexual o violento, ni para el spam o la venta. Cualquiera puede denunciar algo o bloquear a alguien; lo que rompe estas normas se oculta, y las cuentas que insisten se dan de baja.',
+    '7Lights es un lugar para inspirarse. Compartí solo lo que es tuyo o tenés permiso de compartir. No hay lugar para el acoso, el odio, el contenido sexual o violento, ni para el spam o la venta. Cualquiera puede denunciar algo o bloquear a alguien; lo que rompe estas normas se oculta, y las cuentas que insisten se dan de baja.',
   'legal.privacyTitle': 'Tus datos',
   'legal.privacy':
     'Guardamos tu email para que puedas entrar, y lo que vos cargás: perfil, tableros, imágenes, desafíos, notas y comentarios. Los tableros son públicos salvo que los marques como privados; las notas de los desafíos, también. No vendemos tus datos ni mostramos publicidad. Podés borrar tu cuenta y todo su contenido desde Ajustes, en cualquier momento.',
