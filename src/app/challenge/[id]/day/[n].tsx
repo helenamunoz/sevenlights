@@ -2,10 +2,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 
+import { CoverArt } from '@/components/brand';
 import { AudioPlayer } from '@/components/audio-player';
 import { DayTimer } from '@/components/day-timer';
 import { BackBar, Button, Empty, Input, Loading, Screen, Toggle, useToast } from '@/components/ui';
-import { lightColor } from '@/data/chakras';
+import { artwork, challengeColor, isBreathingChallenge } from '@/data/brand';
 import {
   useChallenge,
   useChallengeDays,
@@ -16,7 +17,7 @@ import {
 } from '@/lib/api/challenges';
 import type { Challenge, Checkin } from '@/lib/db.types';
 import { t } from '@/lib/i18n';
-import { color, font, space } from '@/theme/tokens';
+import { afterglow, color, font, space } from '@/theme/tokens';
 
 /** One day of a challenge: what there is to do, then tick it and leave a note. */
 export default function DayScreen() {
@@ -42,7 +43,9 @@ export default function DayScreen() {
 }
 
 function DayView({ challenge, day }: { challenge: Challenge; day: number }) {
-  const accent = lightColor(challenge.light);
+  const breathing = isBreathingChallenge(challenge);
+  const accent = challengeColor(challenge);
+  const checkInAccent = breathing ? afterglow.honey : accent;
   const days = useChallengeDays(challenge.id);
   const { progress, checkins } = useMyProgress(challenge);
 
@@ -63,7 +66,7 @@ function DayView({ challenge, day }: { challenge: Challenge; day: number }) {
       </Text>
 
       {own?.body ? <Text style={styles.body}>{own.body}</Text> : null}
-      {timer ? <DayTimer seconds={timer} accent={accent} /> : null}
+      {timer ? <DayTimer key={`${challenge.id}:${day}:${timer}`} seconds={timer} accent={accent} paper={breathing} /> : null}
       {audio ? <AudioPlayer path={audio} accent={accent} /> : null}
       {link ? (
         <Button
@@ -75,10 +78,11 @@ function DayView({ challenge, day }: { challenge: Challenge; day: number }) {
       ) : null}
 
       <View style={styles.finish}>
+        {breathing && (checkin || open) ? <CoverArt source={artwork.notebook} style={styles.cover} /> : null}
         {checkin ? (
-          <Done challenge={challenge} checkin={checkin} accent={accent} />
+          <Done challenge={challenge} checkin={checkin} accent={checkInAccent} />
         ) : open ? (
-          <Tick challenge={challenge} day={day} accent={accent} />
+          <Tick challenge={challenge} day={day} accent={checkInAccent} />
         ) : (
           <Text style={styles.closed}>
             {!progress
@@ -100,7 +104,7 @@ function Tick({ challenge, day, accent }: { challenge: Challenge; day: number; a
   const toast = useToast();
   const checkIn = useCheckIn();
   const [note, setNote] = useState('');
-  const [shared, setShared] = useState(true);
+  const [shared, setShared] = useState(false);
 
   return (
     <>
@@ -220,6 +224,7 @@ const styles = StyleSheet.create({
   },
   link: { marginBottom: space.lg },
   finish: { marginTop: space.xl },
+  cover: { width: '100%', height: 116, marginBottom: space.md },
   done: { fontFamily: font.bodyBold, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', marginBottom: space.lg },
   closed: { fontFamily: font.displayItalic, fontSize: 17, lineHeight: 25, color: color.textFaint },
   gap: { height: space.md },

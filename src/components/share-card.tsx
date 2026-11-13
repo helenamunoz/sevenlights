@@ -2,12 +2,12 @@ import { useRef, useState, type ReactNode } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Aura } from '@/components/aura';
+import { BrandLockup, CoverArt } from '@/components/brand';
 import { MediaImage } from '@/components/media-image';
 import { Button, useToast } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { shareView } from '@/lib/share';
-import { alpha, color, font, radius, space } from '@/theme/tokens';
+import { afterglow, alpha, color, font, radius, space } from '@/theme/tokens';
 
 /**
  * A picture of a board or of challenge progress, shaped for an Instagram
@@ -27,6 +27,7 @@ export function ShareModal({
   const toast = useToast();
   const card = useRef<View>(null);
   const [busy, setBusy] = useState(false);
+  const [cardWidth, setCardWidth] = useState(0);
 
   async function share() {
     setBusy(true);
@@ -43,13 +44,15 @@ export function ShareModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={[styles.backdrop, { paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.md }]}>
-        <View style={styles.frame}>
-          <View ref={card} collapsable={false} style={styles.card}>
+        <View
+          style={styles.frame}
+          onLayout={({ nativeEvent: { layout } }) => setCardWidth(Math.min(layout.width, layout.height * 9 / 16))}>
+          <View ref={card} collapsable={false} style={[styles.card, { width: cardWidth }]}>
             {children}
           </View>
         </View>
         <View style={styles.actions}>
-          <Button label={t('share.share')} busy={busy} onPress={share} />
+          <Button label={t('share.share')} busy={busy} disabled={cardWidth === 0} onPress={share} />
           <Button label={t('common.close')} kind="quiet" onPress={onClose} />
         </View>
       </View>
@@ -57,27 +60,30 @@ export function ShareModal({
   );
 }
 
-/** The card's shared look: a glow, a small heading, content, the app's name. */
+/** A 9:16 card with paper accents, room for the person's content, and the Ember Ring lockup. */
 export function ShareCard({
   accent,
   eyebrow,
   title,
+  cover,
   children,
 }: {
   accent: string;
   eyebrow: string;
   title: string;
+  cover?: number;
   children?: ReactNode;
 }) {
   return (
     <View style={styles.inner}>
-      <View style={styles.glow} pointerEvents="none">
-        <Aura color={accent} size={420} intensity={1.1} />
+      <View style={[styles.paper, { backgroundColor: alpha(accent, 0.24) }]} pointerEvents="none" />
+      <Text style={styles.eyebrow}>{eyebrow}</Text>
+      <Text style={styles.title} numberOfLines={3}>{title}</Text>
+      <View style={styles.body}>
+        {cover ? <CoverArt source={cover} style={styles.storyCover} /> : null}
+        {children}
       </View>
-      <Text style={[styles.eyebrow, { color: accent }]}>{eyebrow}</Text>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.body}>{children}</View>
-      <Text style={styles.brand}>SevenLights</Text>
+      <BrandLockup compact />
     </View>
   );
 }
@@ -135,20 +141,26 @@ const styles = StyleSheet.create({
   },
   frame: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
   card: {
-    height: '100%',
-    maxWidth: '100%',
     aspectRatio: 9 / 16,
     borderRadius: radius.md,
     overflow: 'hidden',
     backgroundColor: color.ink,
   },
   inner: { flex: 1, alignItems: 'center', padding: space.lg, paddingTop: space.xl },
-  glow: { position: 'absolute', top: -150, alignSelf: 'center' },
+  paper: {
+    position: 'absolute',
+    width: '130%',
+    height: '30%',
+    bottom: '-12%',
+    right: '-20%',
+    transform: [{ rotate: '-12deg' }],
+  },
   eyebrow: {
     fontFamily: font.bodyMedium,
     fontSize: 11,
     letterSpacing: 2.2,
     textTransform: 'uppercase',
+    color: afterglow.mauve,
     textAlign: 'center',
   },
   title: {
@@ -160,13 +172,7 @@ const styles = StyleSheet.create({
     marginTop: space.sm,
   },
   body: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', gap: space.md },
-  brand: {
-    fontFamily: font.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-    color: color.textFaint,
-  },
+  storyCover: { width: '100%', flex: 1, minHeight: 0, marginVertical: space.md },
   mosaic: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, alignSelf: 'stretch' },
   mosaicTile: { width: '49%', aspectRatio: 1, borderRadius: radius.sm, backgroundColor: color.ink2 },
   mosaicSingle: { width: '100%' },

@@ -1,32 +1,41 @@
 /**
- * SevenLights design tokens.
+ * 7Lights Afterglow design tokens.
  *
- * The app commits to one visual world: an ink-dark ground where each chakra
- * appears as its own light. There is no light theme by design — see CLAUDE.md.
+ * The brand palette and chakra colors serve different purposes. See docs/brand-design.md.
  */
 
+export const afterglow = {
+  plum: '#823A69',
+  violet: '#8653A2',
+  mauve: '#BE93BF',
+  cream: '#F7E7CB',
+  honey: '#F5AC34',
+  amber: '#EA791E',
+  ember: '#CE5022',
+} as const;
+
 export const color = {
-  ink: '#0E0C14',
-  ink2: '#16131E',
-  surface: '#1C1826',
-  line: '#2E2839',
-  text: '#EFEAF4',
-  textSoft: '#A79FB6',
-  textFaint: '#6E667E',
-  danger: '#D9544B',
-  ok: '#4E9E6A',
-  warn: '#DFA52C',
+  ink: '#191111',
+  ink2: '#231918',
+  surface: '#2D211F',
+  line: '#59443F',
+  text: afterglow.cream,
+  textSoft: '#D8C0B4',
+  textFaint: '#B39A91',
+  danger: '#F3897F',
+  ok: '#7FAA87',
+  warn: afterglow.honey,
   white: '#FFFFFF',
-  scrim: '#08060C',
+  scrim: '#100A09',
 } as const;
 
 export const font = {
-  display: 'Fraunces_300Light',
-  displayItalic: 'Fraunces_300Light_Italic',
-  displayMedium: 'Fraunces_600SemiBold',
-  body: 'Karla_400Regular',
-  bodyMedium: 'Karla_500Medium',
-  bodyBold: 'Karla_700Bold',
+  display: 'BricolageGrotesque_800ExtraBold',
+  displayItalic: 'InstrumentSans_400Regular_Italic',
+  displayMedium: 'BricolageGrotesque_700Bold',
+  body: 'InstrumentSans_400Regular',
+  bodyMedium: 'InstrumentSans_500Medium',
+  bodyBold: 'InstrumentSans_700Bold',
   deva: 'NotoSerifDevanagari_400Regular',
 } as const;
 

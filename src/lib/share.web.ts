@@ -9,7 +9,7 @@ import { captureRef } from 'react-native-view-shot';
 export async function shareView(view: RefObject<View | null>): Promise<void> {
   const dataUri = await captureRef(view, { format: 'png', quality: 1, result: 'data-uri' });
   const blob = await (await fetch(dataUri)).blob();
-  const file = new File([blob], 'sevenlights.png', { type: 'image/png' });
+  const file = new File([blob], '7lights.png', { type: 'image/png' });
 
   if (navigator.canShare?.({ files: [file] })) {
     await navigator.share({ files: [file] });

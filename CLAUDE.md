@@ -1,4 +1,4 @@
-# SevenLights — working notes
+# 7Lights — working notes
 
 A free app to raise your frequency with two tools: **vision boards** (seven
 chakra boards per person plus any number of free ones) and **challenges**
@@ -24,8 +24,8 @@ also runs on Android and web.
   caller may see (public unless private, hidden by an admin, or blocked either
   way) and may change. Counters, vote rank and hidden flags are only ever
   written there; a request cannot carry a value for them.
-- **One visual world.** Ink-dark ground, each chakra its own light. There is no
-  light theme, on purpose. Do not add one without asking.
+- **One visual world.** The [Afterglow brand guide](docs/brand-design.md) covers the
+  dark espresso theme and Ember Ring. Chakra colors remain category cues.
 
 ## Where things live
 
@@ -56,8 +56,8 @@ tests/e2e/web.mjs                  a browser walk through the web build
   the phone's language. What people write is never translated. Code, comments
   and commits in English.
 - Styles come from `@/theme/tokens` — no loose hex values in components.
-- Fonts: Fraunces for anything that speaks, Karla for labels and UI, Noto Serif
-  Devanagari for the seed syllables only.
+- Fonts: Bricolage Grotesque for headings, Instrument Sans for body and UI,
+  and Noto Serif Devanagari for seed syllables.
 - Text fields keep a local draft and commit on blur (`components/field.tsx`).
 - **Never log what people write.** The function logs operation names and error
   codes only.
@@ -96,5 +96,3 @@ removes what it left. Deploying, seeding and making an admin are in the README.
 3. **Lists read whole partitions.** Explore and the challenge lists load every
    pointer and sort in the function — fine for thousands, not for millions.
 4. **Reordering photos** within a board; **photo captions** UI polish.
-5. **App icon.** Still the Expo default — wants a proper seven-light mark.
-6. **Tab bar labels are clipped on web** at phone widths.

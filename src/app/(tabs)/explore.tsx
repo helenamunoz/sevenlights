@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { RefreshControl, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { BoardCard } from '@/components/board-card';
 import { Button, Empty, Loading, Screen, Segmented, Title } from '@/components/ui';
@@ -12,6 +12,8 @@ export default function ExploreScreen() {
   const [sort, setSort] = useState<ExploreSort>('popular');
   const explore = useExplore(sort);
   const boards = explore.data?.pages.flat() ?? [];
+  const { width, fontScale } = useWindowDimensions();
+  const grid = width >= 360 && fontScale <= 1.3;
 
   return (
     <Screen
@@ -37,9 +39,13 @@ export default function ExploreScreen() {
       {explore.isPending ? <Loading /> : null}
       {explore.isError && boards.length === 0 ? <Empty>{t('common.loadFailed')}</Empty> : null}
       {explore.isSuccess && boards.length === 0 ? <Empty>{t('explore.empty')}</Empty> : null}
-      {boards.map((board) => (
-        <BoardCard key={board.id} board={board} showOwner />
-      ))}
+      <View style={[styles.feed, grid && styles.grid]}>
+        {boards.map((board) => (
+          <View key={board.id} style={grid ? styles.tile : undefined}>
+            <BoardCard board={board} showOwner compact={grid} />
+          </View>
+        ))}
+      </View>
       {explore.hasNextPage ? (
         <Button
           label={t('common.more')}
@@ -54,4 +60,7 @@ export default function ExploreScreen() {
 
 const styles = StyleSheet.create({
   sort: { marginBottom: space.lg },
+  feed: { marginBottom: space.md },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: space.md },
+  tile: { width: '48%' },
 });

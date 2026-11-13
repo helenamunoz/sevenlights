@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "SevenLights",
+    "name": "7Lights",
     "slug": "SevenLights",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "sevenlights",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#0E0C14",
+    "backgroundColor": "#191111",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.helena.sevenlights"
@@ -15,7 +15,7 @@
     "android": {
       "package": "com.helena.sevenlights",
       "adaptiveIcon": {
-        "backgroundColor": "#0E0C14",
+        "backgroundColor": "#321928",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -31,16 +31,16 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0E0C14",
+          "backgroundColor": "#191111",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 84
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "SevenLights uses your photos to build your vision boards.",
-          "cameraPermission": "SevenLights uses the camera to add a photo to a board."
+          "photosPermission": "7Lights uses your photos to build your vision boards.",
+          "cameraPermission": "7Lights uses the camera to add a photo to a board."
         }
       ],
       "expo-localization",
@@ -48,7 +48,7 @@
       [
         "expo-notifications",
         {
-          "color": "#9B6FD1"
+          "color": "#BE93BF"
         }
       ]
     ],

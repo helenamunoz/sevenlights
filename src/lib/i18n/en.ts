@@ -24,7 +24,7 @@ export const en: Record<keyof typeof es, string> = {
   'tabs.challenges': 'Challenges',
   'tabs.profile': 'Profile',
 
-  'signIn.tagline': 'Vision boards and challenges to raise your frequency.',
+  'signIn.tagline': 'Vision boards and daily challenges',
   'signIn.email': 'Your email',
   'signIn.emailPlaceholder': 'you@example.com',
   'signIn.emailHint': 'We’ll send you a one-time code. No passwords.',
@@ -40,7 +40,7 @@ export const en: Record<keyof typeof es, string> = {
   'onboarding.title': 'What should we call you?',
   'onboarding.publicTitle': 'Your boards are shared',
   'onboarding.publicBody':
-    'Anything you put on a board can be seen by anyone on SevenLights, and they can take ideas for their own. Every board has a switch to make it private whenever you like.',
+    'Anything you put on a board can be seen by anyone on 7Lights, and they can take ideas for their own. Every board has a switch to make it private whenever you like.',
   'onboarding.accept': 'I’ve read and accept the community rules',
   'onboarding.start': 'Get started',
 
@@ -99,7 +99,7 @@ export const en: Record<keyof typeof es, string> = {
   'photos.uploading': 'uploading…',
   'photos.fromLibrary': 'Choose from library',
   'photos.fromCamera': 'Take a photo',
-  'photos.noPermission': 'SevenLights needs permission to see your photos. You can change that in Settings.',
+  'photos.noPermission': '7Lights needs permission to see your photos. You can change that in Settings.',
   'photos.failed': 'Couldn’t upload the image.',
   'photos.captionPlaceholder': 'A line about this image',
   'photos.remove': 'Remove from board',
@@ -120,8 +120,8 @@ export const en: Record<keyof typeof es, string> = {
 
   'challenges.eyebrow': 'Daily practice',
   'challenges.title': 'Challenges',
-  'challenges.mine': 'The ones you’re doing',
-  'challenges.suggested': 'Suggested by SevenLights',
+  'challenges.mine': 'In progress',
+  'challenges.suggested': 'Suggested by 7Lights',
   'challenges.community': 'From the community',
   'challenges.top': 'Top voted',
   'challenges.new': 'New',
@@ -134,7 +134,7 @@ export const en: Record<keyof typeof es, string> = {
   'challenge.minutes': '{n} min',
   'challenge.members': '{n} people',
   'challenge.suggested': 'Suggested',
-  'challenge.byApp': 'Suggested by SevenLights',
+  'challenge.byApp': 'Suggested by 7Lights',
   'challenge.day': 'Day {n}',
   'challenge.dayOf': 'Day {day} of {total}',
   'challenge.doneToday': 'Done for today',
@@ -178,7 +178,7 @@ export const en: Record<keyof typeof es, string> = {
   'day.untick': 'Unmark this day',
   'day.note': 'A note (optional)',
   'day.notePlaceholder': 'How did it go today?',
-  'day.share': 'Share the note',
+  'day.share': 'Share this note',
   'day.shareOn': 'Visible to anyone looking at this challenge.',
   'day.shareOff': 'Only you can see it.',
   'day.openLink': 'Open today’s link',
@@ -200,7 +200,7 @@ export const en: Record<keyof typeof es, string> = {
   'reminder.off': 'No reminder',
   'reminder.title': 'What time should we remind you?',
   'reminder.body': 'Today’s practice is waiting for you.',
-  'reminder.denied': 'Notifications are off for SevenLights. You can turn them on in Settings.',
+  'reminder.denied': 'Notifications are off for 7Lights. You can turn them on in Settings.',
 
   'comments.title': 'Comments',
   'comments.placeholder': 'Leave a comment',
@@ -283,7 +283,7 @@ export const en: Record<keyof typeof es, string> = {
   'legal.title': 'Rules and privacy',
   'legal.rulesTitle': 'Community rules',
   'legal.rules':
-    'SevenLights is a place for inspiration. Share only what is yours or what you have permission to share. There is no room for harassment, hate, sexual or violent content, spam or selling. Anyone can report something or block someone; what breaks these rules is hidden, and accounts that keep at it are removed.',
+    '7Lights is a place for inspiration. Share only what is yours or what you have permission to share. There is no room for harassment, hate, sexual or violent content, spam or selling. Anyone can report something or block someone; what breaks these rules is hidden, and accounts that keep at it are removed.',
   'legal.privacyTitle': 'Your data',
   'legal.privacy':
     'We keep your email so you can sign in, and what you add: profile, boards, images, challenges, notes and comments. Boards are public unless you mark them private; so are challenge notes. We don’t sell your data or show ads. You can delete your account and everything in it from Settings at any time.',

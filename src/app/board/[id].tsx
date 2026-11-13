@@ -2,9 +2,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Aura } from '@/components/aura';
 import { Byline } from '@/components/avatar';
 import { boardColor, boardName } from '@/components/board-card';
+import { CoverArt } from '@/components/brand';
 import { Field } from '@/components/field';
 import { PhotoGrid } from '@/components/photo-grid';
 import { BoardPicker, LightPicker } from '@/components/pickers';
@@ -13,6 +13,7 @@ import { ShareCard, ShareModal, ShareMosaic, shareStyles } from '@/components/sh
 import { ActionSheet } from '@/components/sheet';
 import { BackBar, Button, Empty, Input, Label, Loading, Screen, Toggle, useToast } from '@/components/ui';
 import { WordChips } from '@/components/word-chips';
+import { chakraCovers } from '@/data/brand';
 import { CHAKRA_BY_ID } from '@/data/chakras';
 import {
   useAddImages,
@@ -66,9 +67,6 @@ function Head({ board }: { board: Board }) {
 
   return (
     <>
-      <View style={styles.auraSlot} pointerEvents="none">
-        <Aura color={accent} size={360} intensity={0.9} />
-      </View>
       <View style={styles.head}>
         <View style={[styles.bija, { borderColor: alpha(accent, 0.35), backgroundColor: alpha(accent, 0.12) }]}>
           {chakra?.bija ? (
@@ -91,6 +89,7 @@ function Head({ board }: { board: Board }) {
             {tr(chakra.element)} · {tr(chakra.place)}
           </Text>
           <Text style={styles.field}>{tr(chakra.field)}</Text>
+          <CoverArt source={chakraCovers[chakra.id]} style={styles.cover} />
         </>
       ) : null}
     </>
@@ -398,7 +397,8 @@ function BoardShare({ board, visible, onClose }: { board: Board; visible: boolea
       <ShareCard
         accent={boardColor(board)}
         eyebrow={board.chakra ? CHAKRA_BY_ID[board.chakra].sa : t('share.board')}
-        title={boardName(board)}>
+        title={boardName(board)}
+        cover={board.images.length === 0 ? chakraCovers[board.chakra ?? board.light] : undefined}>
         <ShareMosaic paths={board.images.map((image) => image.storage_path)} />
         {board.affirmation || board.intention ? (
           <Text style={shareStyles.quote} numberOfLines={5}>
@@ -416,7 +416,7 @@ function BoardShare({ board, visible, onClose }: { board: Board; visible: boolea
 }
 
 const styles = StyleSheet.create({
-  auraSlot: { position: 'absolute', top: -140, left: -140 },
+  cover: { width: '100%', height: 184, marginTop: space.lg },
   head: { flexDirection: 'row', alignItems: 'flex-start', gap: space.lg, marginTop: space.md },
   bija: {
     width: 84,

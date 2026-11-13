@@ -1,4 +1,4 @@
-# SevenLights
+# 7Lights
 
 A free app to raise your frequency, with two tools:
 
@@ -109,6 +109,8 @@ content disappears for others, and deleting an account removes its content
 while challenge members keep their progress. It removes what it creates.
 
 ## How it is built
+
+See the [brand guide](docs/brand-design.md) for the Afterglow identity, Ember Ring, and app design patterns.
 
 Working notes for whoever (or whatever) works on the code next are in
 `CLAUDE.md`.

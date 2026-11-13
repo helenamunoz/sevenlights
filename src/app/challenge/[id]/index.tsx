@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Aura } from '@/components/aura';
+import { CoverArt } from '@/components/brand';
 import { Byline } from '@/components/avatar';
 import { challengeFacts } from '@/components/challenge-card';
 import { CommentList, Entry, shortDate } from '@/components/comment-list';
@@ -11,7 +11,7 @@ import { ShareCard, ShareDots, ShareModal, shareStyles } from '@/components/shar
 import { ActionSheet, Sheet, SheetRow, type Action } from '@/components/sheet';
 import { BackBar, Button, Empty, Label, Loading, Screen, useToast } from '@/components/ui';
 import { VoteBar } from '@/components/vote-bar';
-import { lightColor } from '@/data/chakras';
+import { challengeColor, challengeCover } from '@/data/brand';
 import {
   useChallenge,
   useDeleteChallenge,
@@ -67,7 +67,8 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
   const router = useRouter();
   const toast = useToast();
   const me = useMe();
-  const accent = lightColor(challenge.light);
+  const accent = challengeColor(challenge);
+  const cover = challengeCover(challenge);
   const { membership, progress } = useMyProgress(challenge);
   const notes = useSharedNotes(challenge.id);
   const join = useJoin();
@@ -117,14 +118,12 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
           }
         />
       }>
-      <View style={styles.glow} pointerEvents="none">
-        <Aura color={accent} size={360} intensity={0.9} />
-      </View>
+      <CoverArt source={cover} style={styles.cover} />
 
       <Text style={styles.facts}>{challengeFacts(challenge)}</Text>
       <Text style={styles.title}>{challenge.title}</Text>
       {challenge.is_official ? (
-        <Text style={[styles.official, { color: accent }]}>{t('challenge.byApp')}</Text>
+        <Text style={styles.official}>{t('challenge.byApp')}</Text>
       ) : (
         <Pressable
           style={styles.creator}
@@ -151,6 +150,17 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
       ) : (
         <View style={styles.block}>
           <Text style={styles.status}>{statusLine(challenge, progress)}</Text>
+          <View
+            style={styles.track}
+            accessibilityRole="progressbar"
+            accessibilityValue={{ min: 0, max: challenge.duration_days, now: progress.done }}>
+            <View
+              style={[
+                styles.fill,
+                { backgroundColor: accent, width: `${(progress.done / challenge.duration_days) * 100}%` },
+              ]}
+            />
+          </View>
           <DayGrid
             challenge={challenge}
             progress={progress}
@@ -333,7 +343,9 @@ function DayGrid({
 }
 
 const styles = StyleSheet.create({
-  glow: { position: 'absolute', top: -150, right: -150 },
+  cover: { height: 194, width: '100%' },
+  track: { height: 8, backgroundColor: color.line, borderRadius: radius.pill, overflow: 'hidden' },
+  fill: { height: '100%', borderRadius: radius.pill },
   link: { fontFamily: font.bodyMedium, fontSize: 14, color: color.textSoft },
   facts: {
     fontFamily: font.bodyMedium,
@@ -347,6 +359,7 @@ const styles = StyleSheet.create({
   official: {
     fontFamily: font.bodyBold,
     fontSize: 11,
+    color: color.textSoft,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
     marginTop: space.md,
