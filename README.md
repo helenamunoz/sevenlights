@@ -21,6 +21,12 @@ npx expo start
 Scan the QR code with **Expo Go** on the iPhone. The repo's `.env` already
 points at the deployed backend (three public values; no secrets).
 
+To try it in a browser instead:
+
+```bash
+npm run web:preview      # builds the web app and serves it on http://localhost:8080
+```
+
 Optional: put the app's Instagram profile in `.env` as
 `EXPO_PUBLIC_INSTAGRAM_URL=https://www.instagram.com/...` to show the
 "follow us" link on the profile tab.

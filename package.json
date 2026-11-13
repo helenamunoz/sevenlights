@@ -75,7 +75,8 @@
     "test": "node --test tests/*.test.mjs",
     "backend": "ampx sandbox --once --identifier main",
     "seed": "node scripts/seed.mjs",
-    "test:backend": "node --test --test-concurrency=1 tests/backend/*.test.mjs"
+    "test:backend": "node --test --test-concurrency=1 tests/backend/*.test.mjs",
+    "web:preview": "expo export -p web && node scripts/serve-web.mjs"
   },
   "private": true
 }
