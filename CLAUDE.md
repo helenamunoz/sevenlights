@@ -86,6 +86,24 @@ with `npm run backend` (deploys) or
 `NODE_USE_ENV_PROXY=1`. If a test run is killed, `node tests/backend/cleanup.mjs`
 removes what it left. Deploying, seeding and making an admin are in the README.
 
+## Previews (Expo)
+
+**Claude publishes every preview, unless Helena says otherwise.** After a
+change to the app, publish it to the `preview` branch without being asked:
+
+```bash
+npx eas-cli update --branch preview --environment preview --message "<what changed>"
+```
+
+- Project: `@tempo.software/SevenLights` on expo.dev; `EXPO_TOKEN` (a robot
+  on that account) is in the environment. Set `NODE_USE_ENV_PROXY=1`.
+- `--environment preview` reads variables from EAS, not `.env`: the three
+  `EXPO_PUBLIC_*` values are stored there. A new public value goes in both
+  (`eas env:create --environment preview --visibility plaintext`).
+- `runtimeVersion` is `exposdk:57.0.0` so Expo Go opens the update; change it
+  with the SDK.
+- Give Helena the update's dashboard link (Preview → QR) when done.
+
 ## Known gaps — good next tasks
 
 1. **A real phone pass**: the emailed code arriving and being accepted, camera
