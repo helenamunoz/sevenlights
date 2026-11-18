@@ -344,7 +344,7 @@ test('votes, rank and comments', async () => {
   assert.equal(top[0].id, state.calendar);
   assert.equal(top[0].creator.username, name('ana'));
   const newest = (await bea.read('challenges', { sort: 'new', language: 'all' })).filter((c) => c.creator_id === ana.id);
-  assert.equal(newest[0].id, state.strict);
+  assert.deepEqual([newest[0].id, newest[1].id], [state.walk, state.strict]);
   const english = await bea.read('challenges', { sort: 'top', language: 'en' });
   assert.equal(english.filter((c) => c.creator_id === ana.id).length, 0);
 
