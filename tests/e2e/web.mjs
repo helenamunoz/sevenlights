@@ -68,7 +68,7 @@ try {
     title: challengeTitle,
     description: 'Tres cosas por las que das gracias, cada noche.',
     duration_days: 7,
-    locale: 'es',
+    locale: 'en',
     missed_rule: 'any_pace',
     category: 'writing',
     start_date: utcDate(),
@@ -84,18 +84,18 @@ try {
 
   await step('sign-in screen asks Cognito for a code', async () => {
     await page.goto(base);
-    await page.getByText('Desafíos diarios y tableros de visión').waitFor();
-    await shot('01-sign-in-es');
-    await page.getByPlaceholder('vos@ejemplo.com').fill(email);
-    await page.getByText('Enviar código').click();
-    await page.getByText(`Lo mandamos a ${email}`).waitFor({ timeout: 20_000 });
+    await page.getByText('Daily challenges and vision boards').waitFor();
+    await shot('01-sign-in');
+    await page.getByPlaceholder('you@example.com').fill(email);
+    await page.getByText('Send code').click();
+    await page.getByText(`We sent it to ${email}`).waitFor({ timeout: 20_000 });
     await shot('02-code-sent');
   });
 
   await step('a wrong code is refused', async () => {
     await page.getByPlaceholder('12345678').fill('00000000');
-    await page.getByText('Entrar', { exact: true }).click();
-    await page.getByText('Ese código no es válido o ya venció.').waitFor({ timeout: 20_000 });
+    await page.getByText('Sign in', { exact: true }).click();
+    await page.getByText('That code isn’t valid or has expired.').waitFor({ timeout: 20_000 });
     await shot('03-wrong-code');
   });
 
@@ -110,53 +110,53 @@ try {
   await step('a signed-in person without a profile lands on onboarding', async () => {
     await page.evaluate((value) => localStorage.setItem('sevenlights.session.v1', value), stored);
     await page.reload();
-    await page.getByText('¿Cómo te llamamos?').waitFor({ timeout: 20_000 });
-    await page.getByPlaceholder('Como querés que te vean').fill('Helena de prueba');
-    await page.getByPlaceholder('tu_usuario').fill(`e2e_${run}`);
+    await page.getByText('What should we call you?').waitFor({ timeout: 20_000 });
+    await page.getByPlaceholder('How you’d like to be seen').fill('Helena de prueba');
+    await page.getByPlaceholder('your_username').fill(`e2e_${run}`);
     await page.getByRole('switch').click();
     await shot('04-onboarding');
-    await page.getByText('Empezar', { exact: true }).click();
+    await page.getByText('Get started', { exact: true }).click();
     // Home is the challenges: the 7Lights team's, one per kind of practice.
-    await page.getByText('Del equipo 7Lights').waitFor({ timeout: 20_000 });
-    await page.getByText('Elegí uno para empezar.').waitFor();
-    await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor({ timeout: 20_000 });
+    await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
+    await page.getByText('Pick one to begin.').waitFor();
+    await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
     await shot('05-home-challenges');
     assert.equal((await me.read('boardsOf', { ownerId: me.id })).length, 0, 'no boards until you make one');
   });
 
   await step('the category chips narrow the list', async () => {
-    await page.getByText('Movimiento', { exact: true }).first().click();
-    await page.locator('[aria-label="Una caminata de 20 minutos, sin pantalla"]').first().waitFor({ timeout: 20_000 });
-    await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor({ state: 'detached' });
+    await page.getByText('Movement', { exact: true }).first().click();
+    await page.locator('[aria-label="A 20-minute walk, phone away"]').first().waitFor({ timeout: 20_000 });
+    await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ state: 'detached' });
     await shot('05b-home-one-category');
-    await page.getByText('Todos', { exact: true }).first().click();
-    await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor();
+    await page.getByText('All', { exact: true }).first().click();
+    await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor();
   });
 
   await step('boards start from templates: a single board, then the chakra set', async () => {
-    await page.getByText('Tableros', { exact: true }).last().click();
-    await page.getByText('Todavía no tenés tableros.').waitFor({ timeout: 20_000 });
-    await page.getByText('Nuevo tablero', { exact: true }).click();
-    await page.getByText('Plantillas').waitFor({ timeout: 20_000 });
+    await page.getByText('Boards', { exact: true }).last().click();
+    await page.getByText('You have no boards yet.').waitFor({ timeout: 20_000 });
+    await page.getByText('New board', { exact: true }).click();
+    await page.getByText('Templates').waitFor({ timeout: 20_000 });
     await shot('05c-board-templates');
-    await page.locator('[aria-label="Gratitud"]').click();
-    await page.getByPlaceholder('¿Qué de lo que ya tenés no querés dar por sentado?').waitFor({ timeout: 20_000 });
+    await page.locator('[aria-label="Gratitude"]').click();
+    await page.getByPlaceholder('What do you already have that you don’t want to take for granted?').waitFor({ timeout: 20_000 });
     await shot('05d-board-from-template');
-    await page.getByLabel('Volver').first().click();
-    await page.getByText('Nuevo tablero', { exact: true }).click();
-    await page.locator('[aria-label="Los siete chakras"]').click();
-    await page.locator('[aria-label*="Centro 7"]').waitFor({ timeout: 30_000 });
+    await page.getByLabel('Back').first().click();
+    await page.getByText('New board', { exact: true }).click();
+    await page.locator('[aria-label="The seven chakras"]').click();
+    await page.locator('[aria-label*="Center 7"]').waitFor({ timeout: 30_000 });
     await shot('05e-boards');
     const boards = await me.read('boardsOf', { ownerId: me.id });
     assert.equal(boards.length, 8);
     assert.equal(boards.filter((board) => board.chakra).length, 7);
-    assert.equal(boards.find((board) => !board.chakra).title, 'Lo que ya tengo');
+    assert.equal(boards.find((board) => !board.chakra).title, 'What I already have');
   });
 
   await step('editing a board saves it', async () => {
-    await page.locator('[aria-label*="Centro 4"]').click();
+    await page.locator('[aria-label*="Center 4"]').click();
     // A chakra board's first field is its intention; the placeholder is that chakra's own question.
-    await page.getByText('Se guarda solo.').waitFor({ timeout: 20_000 });
+    await page.getByText('Saves by itself.').waitFor({ timeout: 20_000 });
     const intention = page.locator('textarea, input').first();
     await intention.fill('Abrir el corazón sin apuro');
     await intention.blur();
@@ -164,16 +164,16 @@ try {
     await shot('06-board-edited');
     const boards = await me.read('boardsOf', { ownerId: me.id });
     assert.equal(boards.find((board) => board.chakra === 'anahata').intention, 'Abrir el corazón sin apuro');
-    await page.getByLabel('Volver').first().click();
+    await page.getByLabel('Back').first().click();
   });
 
   await step('explore shows another person’s public board, with its photo', async () => {
-    await page.getByText('Explorar', { exact: true }).last().click();
+    await page.getByText('Explore', { exact: true }).last().click();
     await page.locator(`[aria-label="${boardTitle}"]`).first().waitFor({ timeout: 20_000 });
     await page.waitForTimeout(1500);
     await shot('07-explore');
     await page.locator(`[aria-label="${boardTitle}"]`).first().click();
-    await page.getByText('sumar al mío').first().waitFor({ timeout: 20_000 });
+    await page.getByText('add to mine').first().waitFor({ timeout: 20_000 });
     await page.waitForFunction(() => [...document.images].some((img) => img.src.includes('amazonaws.com') && img.naturalWidth > 0), null, { timeout: 20_000 });
     await shot('08-someone-elses-board');
   });
@@ -181,18 +181,18 @@ try {
   await step('liking and borrowing: a text, then the whole board', async () => {
     await page.getByText(/^♡/).last().click();
     await page.getByText(/^♥/).last().waitFor();
-    await page.getByText('sumar al mío').first().click();
-    await page.getByText('¿A qué tablero?').waitFor();
+    await page.getByText('add to mine').first().click();
+    await page.getByText('Which board?').waitFor();
     await page.waitForTimeout(700);
     await shot('09-borrow-choose-board');
-    await page.getByText('Garganta', { exact: true }).last().click();
-    await page.getByText(/Listo, está en/).waitFor({ timeout: 20_000 });
-    await page.getByText('Copiar todo el tablero').click();
+    await page.getByText('Throat', { exact: true }).last().click();
+    await page.getByText(/Done, it’s in/).waitFor({ timeout: 20_000 });
+    await page.getByText('Copy the whole board').click();
     await page.waitForTimeout(6000);
     await shot('10-copied-board');
     const boards = await me.read('boardsOf', { ownerId: me.id });
     assert.equal(boards.find((board) => board.chakra === 'vishuddha').intention, 'Vivir cerca del mar');
-    const copy = boards.find((board) => board.chakra === null && board.title !== 'Lo que ya tengo');
+    const copy = boards.find((board) => board.chakra === null && board.title !== 'What I already have');
     assert.ok(copy, 'the copy is a new board');
     assert.equal(copy.images.length, 1);
     assert.equal((await luz.read('board', { id: luzBoard })).like_count, 1);
@@ -200,19 +200,19 @@ try {
 
   await step('joining the team’s breathing challenge and ticking day 1', async () => {
     await page.goto(base);
-    await page.getByText('Del equipo 7Lights').waitFor({ timeout: 20_000 });
+    await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
     await page.locator(`[aria-label="${challengeTitle}"]`).first().waitFor({ timeout: 20_000 });
     await shot('11-challenges');
-    await page.locator('[aria-label="5 minutos de respiración consciente"]').first().click();
-    await page.getByText('Sumarme', { exact: true }).click();
-    await page.getByText('Hacer el día 1').waitFor({ timeout: 20_000 });
+    await page.locator('[aria-label="5 minutes of mindful breathing"]').first().click();
+    await page.getByText('Join', { exact: true }).click();
+    await page.getByText('Do day 1').waitFor({ timeout: 20_000 });
     await shot('12-challenge-joined');
-    await page.getByText('Hacer el día 1').click();
-    await page.getByPlaceholder('¿Cómo te fue hoy?').waitFor({ timeout: 20_000 });
-    await page.getByPlaceholder('¿Cómo te fue hoy?').fill('Cinco minutos tranquilos.');
+    await page.getByText('Do day 1').click();
+    await page.getByPlaceholder('How did it go today?').waitFor({ timeout: 20_000 });
+    await page.getByPlaceholder('How did it go today?').fill('Cinco minutos tranquilos.');
     await shot('13-day-one');
-    await page.getByText('Hecho', { exact: true }).last().click();
-    await page.getByText('✓ Hecho').last().waitFor({ timeout: 20_000 });
+    await page.getByText('Done', { exact: true }).last().click();
+    await page.getByText('✓ Done').last().waitFor({ timeout: 20_000 });
     await shot('14-day-ticked');
     const checkins = await me.read('myCheckins');
     assert.equal(checkins.length, 1);
@@ -225,16 +225,16 @@ try {
     await guest.grantPermissions(['clipboard-read', 'clipboard-write']);
     const visit = await guest.newPage();
     await visit.goto(`${base}/challenge/${luzChallenge}`);
-    await visit.getByText('Enviar código').waitFor({ timeout: 20_000 });
+    await visit.getByText('Send code').waitFor({ timeout: 20_000 });
     // Signing in happens in the same visit; the session lands in storage, as in the app.
     await visit.evaluate((value) => localStorage.setItem('sevenlights.session.v1', value), stored);
     await visit.goto(base);
     await visit.getByText(challengeTitle).first().waitFor({ timeout: 20_000 });
     assert.ok(visit.url().endsWith(`/challenge/${luzChallenge}`));
-    await visit.getByText('Invitar a alguien').click();
-    await visit.getByText('Invitación copiada.').waitFor();
+    await visit.getByText('Invite someone').click();
+    await visit.getByText('Invitation copied.').waitFor();
     const copied = await visit.evaluate(() => navigator.clipboard.readText());
-    assert.match(copied, new RegExp(`^Sumate a «${challengeTitle}» en 7Lights: https://.+/challenge/${luzChallenge}$`));
+    assert.match(copied, new RegExp(`^Join me in “${challengeTitle}” on 7Lights: https://.+/challenge/${luzChallenge}$`));
     await visit.screenshot({ path: join(shots, '14b-invite.png') });
     await guest.close();
   });
@@ -242,18 +242,18 @@ try {
   await step('voting, commenting and reporting on a community challenge', async () => {
     await page.goto(`${base}/challenge/${luzChallenge}`);
     await page.getByText(challengeTitle).first().waitFor({ timeout: 20_000 });
-    await page.getByLabel('Votar a favor').last().click();
-    await page.getByPlaceholder('Dejá un comentario').fill('Qué linda idea, me sumo.');
-    await page.getByText('Publicar', { exact: true }).last().click();
+    await page.getByLabel('Vote up').last().click();
+    await page.getByPlaceholder('Leave a comment').fill('Qué linda idea, me sumo.');
+    await page.getByText('Post', { exact: true }).last().click();
     await page.getByText('Qué linda idea, me sumo.').last().waitFor({ timeout: 20_000 });
     await page.waitForTimeout(1500);
     await shot('15-vote-and-comment');
-    await page.getByLabel('Ver más').first().click();
-    await page.getByText('Denunciar', { exact: true }).first().click();
-    await page.getByPlaceholder('Motivo (opcional)').fill('Prueba automática');
+    await page.getByLabel('Show more').first().click();
+    await page.getByText('Report', { exact: true }).first().click();
+    await page.getByPlaceholder('Reason (optional)').fill('Prueba automática');
     await shot('16-report');
-    await page.getByText('Enviar denuncia').click();
-    await page.getByText('Gracias. Lo vamos a revisar.').waitFor({ timeout: 20_000 });
+    await page.getByText('Send report').click();
+    await page.getByText('Thank you. We’ll review it.').waitFor({ timeout: 20_000 });
     const challenge = await luz.read('challenge', { id: luzChallenge });
     assert.equal(challenge.up_count, 1);
     assert.equal(challenge.comment_count, 1);
@@ -262,23 +262,16 @@ try {
     assert.equal(reports[0].reporter_id, me.id);
   });
 
-  await step('the same account in English', async () => {
-    const english = await browser.newContext({ locale: 'en-US', viewport: { width: 414, height: 896 }, deviceScaleFactor: 2 });
-    const signedOut = await english.newPage();
-    await signedOut.goto(base);
-    await signedOut.getByText('Daily challenges and vision boards to raise your frequency.').waitFor({ timeout: 20_000 });
-    await signedOut.screenshot({ path: join(shots, '17-sign-in-en.png') });
-    await signedOut.evaluate((value) => localStorage.setItem('sevenlights.session.v1', value), stored);
-    await signedOut.reload();
-    await signedOut.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
-    await signedOut.getByText('In progress').waitFor();
-    await signedOut.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
-    await signedOut.screenshot({ path: join(shots, '18-home-en.png') });
-    // What people wrote is never translated.
-    await signedOut.getByText('All languages').click().catch(() => {});
-    await signedOut.waitForTimeout(1500);
-    await signedOut.screenshot({ path: join(shots, '19-challenges-en.png') });
-    await english.close();
+  await step('the app is English-only for now, with no language choices', async () => {
+    // The browser above is set to Spanish (es-AR) and every screen so far was in English.
+    await page.goto(base);
+    await page.getByText('From the community').waitFor({ timeout: 20_000 });
+    await page.getByText('In progress').waitFor();
+    assert.equal(await page.getByText('All languages').count(), 0);
+    await page.getByText('Create a challenge').click();
+    await page.getByText('Kind of practice').waitFor({ timeout: 20_000 });
+    assert.equal(await page.getByText('Challenge language').count(), 0);
+    await shot('17-create-challenge');
   });
 
   assert.deepEqual(failures, [], 'no uncaught errors in the page');

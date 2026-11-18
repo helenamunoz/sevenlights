@@ -457,7 +457,7 @@ test('deleting an account removes its content and sign-in, and keeps others’ p
   await bea.write('updateProfile', { username: name('bea') });
 });
 
-test('seed: the 7Lights team challenges, one per kind in each language, safe to repeat', async () => {
+test('seed: the 7Lights team challenges, in order, safe to repeat', async () => {
   const lambda = new LambdaClient({ region });
   for (let i = 0; i < 2; i++) {
     const reply = await lambda.send(
@@ -467,12 +467,12 @@ test('seed: the 7Lights team challenges, one per kind in each language, safe to 
   }
   for (const locale of ['es', 'en']) {
     const suggested = await bea.read('suggestedChallenges', { locale });
-    assert.equal(suggested.length, 7);
+    // The first six exist in both languages; the newer six are English-only for now.
+    const first = ['breath', 'meditation', 'movement', 'writing', 'rest', 'chakras'];
+    const newer = ['habits', 'breath', 'movement', 'writing', 'habits', 'meditation'];
     assert.ok(suggested.every((c) => c.is_official && c.creator_id === null));
-    assert.deepEqual(
-      suggested.map((c) => c.category),
-      ['breath', 'meditation', 'movement', 'writing', 'rest', 'habits', 'chakras']
-    );
+    assert.deepEqual(suggested.map((c) => c.category), locale === 'en' ? [...first, ...newer] : first);
+    assert.ok(!suggested.some((c) => c.id.startsWith('official-water-')), 'retired challenges are not offered');
     assert.equal(suggested[0].id, `official-breathing-${locale}`);
     assert.equal(suggested[0].duration_days, 21);
     assert.equal(suggested[0].timer_seconds, 300);

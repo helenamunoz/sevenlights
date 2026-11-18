@@ -1,8 +1,9 @@
 import { batchWrite, put, update, type Item } from './db';
 
 /**
- * Starter content: the challenges signed by the 7Lights team, one per kind of
- * practice, each in both languages. The texts are original to 7Lights.
+ * Starter content: the challenges signed by the 7Lights team, across the
+ * kinds of practice. The first ones are in both languages; the newer ones
+ * are in English only while the app is. The texts are original to 7Lights.
  * Running this again changes nothing that people have done — a challenge row
  * is only written if it is not there yet.
  */
@@ -11,18 +12,25 @@ type Copy = { title: string; description: string; days: [number, string][] };
 
 type TeamChallenge = {
   slug: string;
+  /** Where it sits in the list. Never reuse a number: it is the row's date. */
+  order: number;
   category: string;
   duration_days: number;
   timer_seconds: number | null;
   light: string;
-  es: Copy;
+  /** Written while the app is English-only; Spanish follows when it is switched back on. */
+  es?: Copy;
   en: Copy;
 };
+
+/** No longer offered. The rows stay for the people already doing them. */
+const RETIRED = ['water'];
 
 /** In the order the app lists them. */
 const TEAM: TeamChallenge[] = [
   {
     slug: 'breathing',
+    order: 0,
     category: 'breath',
     duration_days: 21,
     timer_seconds: 300,
@@ -52,6 +60,7 @@ const TEAM: TeamChallenge[] = [
   },
   {
     slug: 'stillness',
+    order: 1,
     category: 'meditation',
     duration_days: 14,
     timer_seconds: 600,
@@ -83,6 +92,7 @@ const TEAM: TeamChallenge[] = [
   },
   {
     slug: 'walk',
+    order: 2,
     category: 'movement',
     duration_days: 14,
     timer_seconds: 1200,
@@ -114,6 +124,7 @@ const TEAM: TeamChallenge[] = [
   },
   {
     slug: 'three-lines',
+    order: 3,
     category: 'writing',
     duration_days: 21,
     timer_seconds: null,
@@ -145,6 +156,7 @@ const TEAM: TeamChallenge[] = [
   },
   {
     slug: 'screens-off',
+    order: 4,
     category: 'rest',
     duration_days: 7,
     timer_seconds: null,
@@ -173,36 +185,8 @@ const TEAM: TeamChallenge[] = [
     },
   },
   {
-    slug: 'water',
-    category: 'habits',
-    duration_days: 14,
-    timer_seconds: null,
-    light: 'svadhisthana',
-    es: {
-      title: 'Un vaso de agua al despertar',
-      description:
-        'Antes del mate, del café y del teléfono: un vaso de agua. Es un gesto mínimo para empezar el día eligiendo algo vos. Dejá el vaso listo la noche anterior.',
-      days: [
-        [1, 'Esta noche dejá el vaso servido donde lo veas al levantarte.'],
-        [5, 'Tomalo despacio, de pie, sin hacer otra cosa.'],
-        [9, 'Sumale diez segundos: mirá por la ventana mientras tomás.'],
-        [14, 'Último día. ¿Qué otro gesto chico querés sumar a tu mañana?'],
-      ],
-    },
-    en: {
-      title: 'A glass of water when you wake up',
-      description:
-        'Before coffee, before your phone: a glass of water. It’s a tiny way to start the day by choosing something yourself. Leave the glass ready the night before.',
-      days: [
-        [1, 'Tonight, leave the glass poured where you’ll see it when you get up.'],
-        [5, 'Drink it slowly, standing, doing nothing else.'],
-        [9, 'Add ten seconds: look out the window while you drink.'],
-        [14, 'Last day. What other small gesture would you add to your morning?'],
-      ],
-    },
-  },
-  {
     slug: 'seven-centers',
+    order: 6,
     category: 'chakras',
     duration_days: 7,
     timer_seconds: 300,
@@ -236,13 +220,134 @@ const TEAM: TeamChallenge[] = [
       ],
     },
   },
+  {
+    slug: 'phone-free-morning',
+    order: 7,
+    category: 'habits',
+    duration_days: 14,
+    timer_seconds: null,
+    light: 'manipura',
+    en: {
+      title: 'The first half hour without your phone',
+      description:
+        'For two weeks, the first thirty minutes of your day belong to you. No messages, no news, no feed. Get up, wash, look outside, do whatever your morning needs, and only then pick up the phone.',
+      days: [
+        [1, 'Tonight, charge your phone somewhere you have to walk to.'],
+        [3, 'Notice the pull to check. Name it, and carry on with your morning.'],
+        [7, 'One week. What have you done with those thirty minutes?'],
+        [10, 'Try stretching it to forty-five minutes today.'],
+        [14, 'Last day. Decide how you want your mornings to begin from now on.'],
+      ],
+    },
+  },
+  {
+    slug: 'box-breathing',
+    order: 8,
+    category: 'breath',
+    duration_days: 7,
+    timer_seconds: 180,
+    light: 'vishuddha',
+    en: {
+      title: 'Box breathing: four counts, three minutes',
+      description:
+        'In for four, hold for four, out for four, hold for four. Three minutes a day for a week. Count at whatever pace is comfortable, and if holding feels like too much, shorten the count.',
+      days: [
+        [1, 'Learn the shape today: in, hold, out, hold. Four counts each.'],
+        [3, 'Try it somewhere ordinary: at your desk, on a bench, in a queue.'],
+        [5, 'Let the counts slow down a little, without forcing them.'],
+        [7, 'Last day. Do it once with your eyes open, looking at one thing.'],
+      ],
+    },
+  },
+  {
+    slug: 'morning-stretch',
+    order: 9,
+    category: 'movement',
+    duration_days: 21,
+    timer_seconds: 300,
+    light: 'svadhisthana',
+    en: {
+      title: 'A five-minute stretch when you wake up',
+      description:
+        'Before the day starts, five minutes of moving slowly: neck, shoulders, back, hips, legs. No routine to learn and nothing to achieve. Go gently, and stop short of anything that hurts.',
+      days: [
+        [1, 'Start standing. Reach up, then fold forward and let your arms hang.'],
+        [5, 'Today, give the whole five minutes to your neck and shoulders.'],
+        [10, 'Add your hips: slow circles, one way and then the other.'],
+        [15, 'Move with your breath: reach on the in-breath, release on the out-breath.'],
+        [21, 'Last day. Do the stretches your body asked for most these three weeks.'],
+      ],
+    },
+  },
+  {
+    slug: 'morning-pages',
+    order: 10,
+    category: 'writing',
+    duration_days: 30,
+    timer_seconds: 600,
+    light: 'ajna',
+    en: {
+      title: 'Morning pages: ten minutes without stopping',
+      description:
+        'Ten minutes of writing by hand, first thing, without lifting the pen. Whatever is in your head goes on the page: plans, complaints, dreams, lists. Nobody reads it, including you, unless you want to.',
+      days: [
+        [1, 'If nothing comes, write “nothing comes” until something does.'],
+        [7, 'One week. Keep the pen moving, even through the dull parts.'],
+        [14, 'Today, begin with “What I really want is…”.'],
+        [21, 'Three weeks. Notice what keeps coming back onto the page.'],
+        [30, 'Last day. Write about what these pages have been for you.'],
+      ],
+    },
+  },
+  {
+    slug: 'tidy-corner',
+    order: 11,
+    category: 'habits',
+    duration_days: 14,
+    timer_seconds: 600,
+    light: 'muladhara',
+    en: {
+      title: 'Ten minutes tidying one corner',
+      description:
+        'Pick one small place each day, a drawer, a shelf, the chair where things pile up, and give it ten minutes. When the timer ends, you stop, finished or not. Two weeks of corners add up.',
+      days: [
+        [1, 'Start with the surface you see first when you walk in.'],
+        [4, 'Today: one drawer. Only one.'],
+        [8, 'Choose the corner you have been avoiding.'],
+        [11, 'Let go of three things you no longer use.'],
+        [14, 'Last day. Walk through your place and look at what changed.'],
+      ],
+    },
+  },
+  {
+    slug: 'sky',
+    order: 12,
+    category: 'meditation',
+    duration_days: 7,
+    timer_seconds: 120,
+    light: 'sahasrara',
+    en: {
+      title: 'Two minutes looking at the sky',
+      description:
+        'Once a day, step outside or go to a window and look up for two minutes. Clouds, color, light, whatever is there. Nothing to do but look.',
+      days: [
+        [1, 'Find your spot: a door, a balcony, a window that shows some sky.'],
+        [3, 'Today, look at a different time of day than yesterday.'],
+        [5, 'Follow one thing as it moves: a cloud, a bird, the light.'],
+        [7, 'Last day. Look for the farthest thing you can see.'],
+      ],
+    },
+  },
 ];
 
 export async function seed(): Promise<{ created: number; challenges: number }> {
   let created = 0;
-  for (const [index, entry] of TEAM.entries()) {
+  let challenges = 0;
+  for (const entry of TEAM) {
     for (const locale of ['es', 'en'] as const) {
       const copy = entry[locale];
+      if (!copy) continue;
+      challenges++;
       const id = `official-${entry.slug}-${locale}`;
       const challenge: Item = {
         pk: `CH#${id}`,
@@ -266,8 +371,8 @@ export async function seed(): Promise<{ created: number; challenges: number }> {
         member_count: 0,
         comment_count: 0,
         hidden_at: null,
-        // A second apart, so they always list in the order above.
-        created_at: new Date(Date.UTC(2026, 0, 1, 0, 0, index)).toISOString(),
+        // A second apart, so they always list in their order.
+        created_at: new Date(Date.UTC(2026, 0, 1, 0, 0, entry.order)).toISOString(),
       };
       try {
         await put(challenge, true);
@@ -296,5 +401,9 @@ export async function seed(): Promise<{ created: number; challenges: number }> {
       ]);
     }
   }
-  return { created, challenges: TEAM.length * 2 };
+  await batchWrite(
+    [],
+    RETIRED.flatMap((slug) => ['es', 'en'].map((locale) => ({ pk: `CHLO#${locale}`, sk: `official-${slug}-${locale}` })))
+  );
+  return { created, challenges };
 }

@@ -10,7 +10,7 @@ import type { CategoryId } from '@/data/categories';
 import type { ChakraId } from '@/data/chakras';
 import { useCreateChallenge, type PickedAudio } from '@/lib/api/challenges';
 import type { MissedRule } from '@/lib/db.types';
-import { locale, t, type Locale, type TextKey } from '@/lib/i18n';
+import { LANGUAGES, locale, t, type Locale, type TextKey } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
 
 const DURATIONS = ['7', '21', '30', '49'];
@@ -146,17 +146,21 @@ export default function NewChallengeScreen() {
         <Text style={styles.hint}>{t(RULE_HINT[rule])}</Text>
       </View>
 
-      <Label>{t('new.language')}</Label>
-      <View style={styles.block}>
-        <Segmented
-          value={language}
-          onChange={setLanguage}
-          options={[
-            { value: 'es', label: 'Español' },
-            { value: 'en', label: 'English' },
-          ]}
-        />
-      </View>
+      {LANGUAGES.length > 1 ? (
+        <>
+        <Label>{t('new.language')}</Label>
+        <View style={styles.block}>
+          <Segmented
+            value={language}
+            onChange={setLanguage}
+            options={[
+              { value: 'es', label: 'Español' },
+              { value: 'en', label: 'English' },
+            ]}
+          />
+        </View>
+        </>
+      ) : null}
 
       <Label>{t('new.category')}</Label>
       <CategoryPicker value={category} onChange={setCategory} />

@@ -14,7 +14,7 @@ import {
   type ChallengeSort,
 } from '@/lib/api/challenges';
 import { progress } from '@/lib/days';
-import { locale, t, type Locale } from '@/lib/i18n';
+import { LANGUAGES, locale, t, type Locale } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
 
 /**
@@ -94,14 +94,16 @@ export default function ChallengesScreen() {
               { value: 'new', label: t('challenges.new') },
             ]}
           />
-          <Segmented
-            value={language}
-            onChange={setLanguage}
-            options={[
-              { value: locale, label: t('challenges.myLanguage') },
-              { value: 'all', label: t('challenges.allLanguages') },
-            ]}
-          />
+          {LANGUAGES.length > 1 ? (
+            <Segmented
+              value={language}
+              onChange={setLanguage}
+              options={[
+                { value: locale, label: t('challenges.myLanguage') },
+                { value: 'all', label: t('challenges.allLanguages') },
+              ]}
+            />
+          ) : null}
         </View>
         {community.isPending ? <Loading /> : null}
         {community.isError && !community.data ? <Empty>{t('common.loadFailed')}</Empty> : null}

@@ -15,7 +15,8 @@ A free app to raise your frequency through daily practice done in company:
   private switch on each. Other people can like a board and borrow from it: a
   photo, a text, or the whole page.
 
-Spanish and English, following the phone's language. iPhone, Android and web.
+In English for now; a complete Spanish version is in the code, switched off
+(`LANGUAGES` in `src/lib/i18n/index.ts`). iPhone, Android and web.
 
 ## Run the app
 

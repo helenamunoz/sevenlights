@@ -60,9 +60,11 @@ tests/e2e/web.mjs                  a browser walk through the web build
 
 ## Conventions
 
-- Spanish (rioplatense voseo: "guardá", "sumá", "podés") and English, following
-  the phone's language. What people write is never translated. Code, comments
-  and commits in English.
+- **English-only for now** (`LANGUAGES` in `src/lib/i18n/index.ts`). The Spanish
+  dictionary (rioplatense voseo: "guardá", "sumá", "podés") is kept complete so
+  it can be switched back on; new team challenges are written in English only
+  until then. What people write is never translated. Code, comments and
+  commits in English.
 - Styles come from `@/theme/tokens` — no loose hex values in components.
 - Fonts: Bricolage Grotesque for headings, Instrument Sans for body and UI,
   and Noto Serif Devanagari for seed syllables.

@@ -4,14 +4,22 @@ import { en } from './en';
 import { es } from './es';
 
 /**
- * Interface text in Spanish (rioplatense voseo) and English, following the
- * phone's language. What people write — boards, challenges, notes — is never
- * translated; it stays as they wrote it.
+ * Interface text in Spanish (rioplatense voseo) and English. What people
+ * write — boards, challenges, notes — is never translated; it stays as they
+ * wrote it.
  */
 export type Locale = 'es' | 'en';
 export type TextKey = keyof typeof es;
 
-export const locale: Locale = getLocales()[0]?.languageCode === 'es' ? 'es' : 'en';
+/**
+ * The languages switched on, the first being the fallback. The app is
+ * English-only for now: Spanish stays written and maintained, and adding 'es'
+ * here brings it back for phones set to Spanish.
+ */
+export const LANGUAGES: Locale[] = ['en'];
+
+const phone = getLocales()[0]?.languageCode;
+export const locale: Locale = LANGUAGES.find((language) => language === phone) ?? LANGUAGES[0];
 
 const dictionary: Record<TextKey, string> = locale === 'es' ? es : en;
 
