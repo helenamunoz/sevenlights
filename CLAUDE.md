@@ -123,6 +123,11 @@ scripts/testflight.sh     # EAS build for iOS, then auto-submit to TestFlight
   TSPPH79V85, Individual, expires 2027-08-17, also used by Vayu, Bruma and
   Brotia), an App Store profile for this bundle, and the submit key
   `9QBL4FM745`. Never revoke or replace the certificate: the other apps use it.
+- The bundle ID has the Push Notifications capability (expo-notifications adds
+  the `aps-environment` entitlement). If a new capability or plugin breaks
+  signing, run the build interactively in tmux once: EAS syncs capabilities
+  and regenerates the profile; answer "reuse the original profile".
+- Reminders are local notifications; there is no push key and none is needed.
 - `APPLE_TEAM_ID` becomes `EXPO_APPLE_TEAM_ID`. Build numbers increment on EAS
   (`appVersionSource: remote`). The free EAS plan allows ~15 iOS builds a month.
 - Builds use the `production` EAS environment: its `EXPO_PUBLIC_*` values must
