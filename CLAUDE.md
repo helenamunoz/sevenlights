@@ -119,6 +119,10 @@ scripts/testflight.sh     # EAS build for iOS, then auto-submit to TestFlight
 - The working key is the `ASC_*` set (`ASC_KEY_ID`, `ASC_ISSUER_ID`,
   `ASC_PRIVATE_KEY`); `APPLE_API_*` is rejected by Apple. `scripts/asc-key.mjs`
   tests them, writes the `.p8` to a temp file and exports `EXPO_ASC_*`.
+- iOS credentials live on EAS: the shared distribution certificate (team
+  TSPPH79V85, Individual, expires 2027-08-17, also used by Vayu, Bruma and
+  Brotia), an App Store profile for this bundle, and the submit key
+  `9QBL4FM745`. Never revoke or replace the certificate: the other apps use it.
 - `APPLE_TEAM_ID` becomes `EXPO_APPLE_TEAM_ID`. Build numbers increment on EAS
   (`appVersionSource: remote`). The free EAS plan allows ~15 iOS builds a month.
 - Builds use the `production` EAS environment: its `EXPO_PUBLIC_*` values must

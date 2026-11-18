@@ -7,5 +7,6 @@ cd "$(dirname "$0")/.."
 export NODE_USE_ENV_PROXY=1 NODE_NO_WARNINGS=1
 eval "$(node scripts/asc-key.mjs)"
 export EXPO_APPLE_TEAM_ID="${APPLE_TEAM_ID:?APPLE_TEAM_ID is not set}"
+export EXPO_APPLE_TEAM_TYPE=INDIVIDUAL
 npx -y eas-cli@latest build --platform ios --profile production \
   --auto-submit --non-interactive --no-wait "$@" </dev/null

@@ -10,7 +10,10 @@
     "backgroundColor": "#191111",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.helena.sevenlights"
+      "bundleIdentifier": "com.helena.sevenlights",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.helena.sevenlights",
