@@ -1,3 +1,4 @@
+import type { CategoryId } from '@/data/categories';
 import type { ChakraId } from '@/data/chakras';
 import type { Locale } from '@/lib/i18n';
 
@@ -58,6 +59,9 @@ export type Challenge = {
   duration_days: number;
   locale: Locale;
   missed_rule: MissedRule;
+  /** Missing on challenges from before categories existed; read it with categoryOf(). */
+  category?: CategoryId;
+  /** Only meaningful when the category is chakras. */
   light: ChakraId;
   timer_seconds: number | null;
   audio_path: string | null;

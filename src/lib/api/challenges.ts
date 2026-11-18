@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { CategoryId } from '@/data/categories';
 import type { ChakraId } from '@/data/chakras';
 import { useMe } from '@/lib/auth';
 import { localDate, progress, type Progress } from '@/lib/days';
@@ -19,15 +20,15 @@ import { uploadAudio } from '@/lib/media';
 
 export type ChallengeSort = 'top' | 'new';
 
-/** Community challenges. "top" follows the vote rank, then how many joined. */
-export function useChallenges(sort: ChallengeSort, language: Locale | 'all') {
+/** Community challenges, of one kind or all. "top" follows the vote rank, then how many joined. */
+export function useChallenges(sort: ChallengeSort, language: Locale | 'all', category: CategoryId | null) {
   return useQuery({
-    queryKey: ['challenges', sort, language],
-    queryFn: () => read<Challenge[]>('challenges', { sort, language }),
+    queryKey: ['challenges', sort, language, category],
+    queryFn: () => read<Challenge[]>('challenges', { sort, language, category }),
   });
 }
 
-/** The ones suggested by the app, in the phone's language. */
+/** The ones by the 7Lights team, in the phone's language. */
 export function useSuggestedChallenges() {
   return useQuery({
     queryKey: ['challenges', 'suggested', locale],
@@ -297,6 +298,7 @@ export type NewChallenge = {
   duration_days: number;
   locale: Locale;
   missed_rule: MissedRule;
+  category: CategoryId;
   light: ChakraId;
   timer_seconds: number | null;
   link_url: string | null;

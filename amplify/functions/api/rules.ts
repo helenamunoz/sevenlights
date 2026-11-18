@@ -20,6 +20,8 @@ export const CHAKRAS = [
   'ajna',
   'sahasrara',
 ] as const;
+/** What kind of practice a challenge is. Chakras are one kind among the others. */
+export const CATEGORIES = ['breath', 'meditation', 'movement', 'writing', 'rest', 'habits', 'chakras', 'other'];
 export const LOCALES = ['es', 'en'];
 export const RULES = ['calendar', 'any_pace', 'strict'];
 export const REPORT_TARGETS = ['board', 'challenge', 'comment', 'checkin', 'profile'];

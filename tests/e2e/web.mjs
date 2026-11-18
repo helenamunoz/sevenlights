@@ -70,7 +70,7 @@ try {
     duration_days: 7,
     locale: 'es',
     missed_rule: 'any_pace',
-    light: 'manipura',
+    category: 'writing',
     start_date: utcDate(),
     days: [{ day_number: 1, body: 'Empezá por lo más chico.' }],
   });
@@ -84,7 +84,7 @@ try {
 
   await step('sign-in screen asks Cognito for a code', async () => {
     await page.goto(base);
-    await page.getByText('Tableros de visión y desafíos').waitFor();
+    await page.getByText('Desafíos diarios y tableros de visión').waitFor();
     await shot('01-sign-in-es');
     await page.getByPlaceholder('vos@ejemplo.com').fill(email);
     await page.getByText('Enviar código').click();
@@ -116,12 +116,27 @@ try {
     await page.getByRole('switch').click();
     await shot('04-onboarding');
     await page.getByText('Empezar', { exact: true }).click();
-    await page.getByText('Siete Luces').waitFor({ timeout: 20_000 });
-    await shot('05-home-seven-boards');
+    // Home is the challenges: the 7Lights team's, one per kind of practice.
+    await page.getByText('Del equipo 7Lights').waitFor({ timeout: 20_000 });
+    await page.getByText('Elegí uno para empezar.').waitFor();
+    await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor({ timeout: 20_000 });
+    await shot('05-home-challenges');
     assert.equal((await me.read('boardsOf', { ownerId: me.id })).length, 7);
   });
 
+  await step('the category chips narrow the list', async () => {
+    await page.getByText('Movimiento', { exact: true }).first().click();
+    await page.locator('[aria-label="Una caminata de 20 minutos, sin pantalla"]').first().waitFor({ timeout: 20_000 });
+    await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor({ state: 'detached' });
+    await shot('05b-home-one-category');
+    await page.getByText('Todos', { exact: true }).first().click();
+    await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor();
+  });
+
   await step('editing a board saves it', async () => {
+    await page.getByText('Tableros', { exact: true }).last().click();
+    await page.getByText('Siete Luces').waitFor({ timeout: 20_000 });
+    await shot('05c-seven-boards');
     await page.locator('[aria-label*="Centro 4"]').click();
     // A chakra board's first field is its intention; the placeholder is that chakra's own question.
     await page.getByText('Se guarda solo.').waitFor({ timeout: 20_000 });
@@ -166,11 +181,9 @@ try {
     assert.equal((await luz.read('board', { id: luzBoard })).like_count, 1);
   });
 
-  await step('joining the suggested breathing challenge and ticking day 1', async () => {
+  await step('joining the team’s breathing challenge and ticking day 1', async () => {
     await page.goto(base);
-    await page.getByText('Siete Luces').waitFor({ timeout: 20_000 });
-    await page.getByText('Desafíos', { exact: true }).last().click();
-    await page.getByText('Sugeridos por 7Lights').waitFor({ timeout: 20_000 });
+    await page.getByText('Del equipo 7Lights').waitFor({ timeout: 20_000 });
     await page.locator(`[aria-label="${challengeTitle}"]`).first().waitFor({ timeout: 20_000 });
     await shot('11-challenges');
     await page.locator('[aria-label="5 minutos de respiración consciente"]').first().click();
@@ -217,14 +230,13 @@ try {
     const english = await browser.newContext({ locale: 'en-US', viewport: { width: 414, height: 896 }, deviceScaleFactor: 2 });
     const signedOut = await english.newPage();
     await signedOut.goto(base);
-    await signedOut.getByText('Vision boards and challenges to raise your frequency.').waitFor({ timeout: 20_000 });
+    await signedOut.getByText('Daily challenges and vision boards to raise your frequency.').waitFor({ timeout: 20_000 });
     await signedOut.screenshot({ path: join(shots, '17-sign-in-en.png') });
     await signedOut.evaluate((value) => localStorage.setItem('sevenlights.session.v1', value), stored);
     await signedOut.reload();
-    await signedOut.getByText('Seven Lights').waitFor({ timeout: 20_000 });
+    await signedOut.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
+    await signedOut.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
     await signedOut.screenshot({ path: join(shots, '18-home-en.png') });
-    await signedOut.getByText('Challenges', { exact: true }).last().click();
-    await signedOut.locator('[aria-label="5 minutes of mindful breathing"]').first().waitFor({ timeout: 20_000 });
     // What people wrote is never translated.
     await signedOut.getByText('All languages').click().catch(() => {});
     await signedOut.waitForTimeout(1500);

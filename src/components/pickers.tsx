@@ -1,13 +1,14 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { boardColor, boardName } from '@/components/board-card';
 import { Sheet, SheetRow } from '@/components/sheet';
 import { Loading } from '@/components/ui';
+import { CATEGORIES, type CategoryId } from '@/data/categories';
 import { CHAKRAS, type ChakraId } from '@/data/chakras';
 import { useMyBoards } from '@/lib/api/boards';
 import type { Board } from '@/lib/db.types';
 import { t, tr } from '@/lib/i18n';
-import { color, space } from '@/theme/tokens';
+import { alpha, color, font, radius, space } from '@/theme/tokens';
 
 /** Seven dots to choose the light of a free board or a challenge. */
 export function LightPicker({ value, onChange }: { value: ChakraId; onChange: (value: ChakraId) => void }) {
@@ -29,6 +30,46 @@ export function LightPicker({ value, onChange }: { value: ChakraId; onChange: (v
         );
       })}
     </View>
+  );
+}
+
+/**
+ * The kinds of practice, as chips. With `allLabel` the first chip means "any
+ * kind" (null) and the row scrolls sideways, for filtering a list; without it
+ * the chips wrap, for choosing one in a form.
+ */
+export function CategoryPicker<T extends CategoryId | null>({
+  value,
+  onChange,
+  allLabel,
+}: {
+  value: T;
+  onChange: (value: T) => void;
+  allLabel?: string;
+}) {
+  const options: { id: CategoryId | null; label: string }[] = [
+    ...(allLabel ? [{ id: null, label: allLabel }] : []),
+    ...CATEGORIES.map((category) => ({ id: category.id, label: tr(category.name) })),
+  ];
+  const chips = options.map((option) => {
+    const on = option.id === value;
+    return (
+      <Pressable
+        key={option.id ?? 'all'}
+        onPress={() => onChange(option.id as T)}
+        accessibilityRole="button"
+        accessibilityState={{ selected: on }}
+        style={[styles.chip, on && styles.chipOn]}>
+        <Text style={[styles.chipText, on && styles.chipTextOn]}>{option.label}</Text>
+      </Pressable>
+    );
+  });
+  return allLabel ? (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow} style={styles.chipScroll}>
+      {chips}
+    </ScrollView>
+  ) : (
+    <View style={styles.chipWrap}>{chips}</View>
   );
 }
 
@@ -66,6 +107,20 @@ export function BoardPicker({
 }
 
 const styles = StyleSheet.create({
+  chipScroll: { marginBottom: space.lg, flexGrow: 0 },
+  chipRow: { gap: space.sm },
+  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginBottom: space.lg },
+  chip: {
+    minHeight: 36,
+    justifyContent: 'center',
+    paddingHorizontal: space.md,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: color.line,
+  },
+  chipOn: { backgroundColor: alpha(color.text, 0.16), borderColor: alpha(color.text, 0.5) },
+  chipText: { fontFamily: font.bodyMedium, fontSize: 13, color: color.textSoft },
+  chipTextOn: { color: color.text },
   lights: { flexDirection: 'row', gap: space.sm, marginBottom: space.lg },
   ring: {
     width: 36,

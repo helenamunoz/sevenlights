@@ -1,4 +1,4 @@
-// Writes the app's starter content (the breathing challenge, in both
+// Writes the app's starter content (the 7Lights team's challenges, in both
 // languages) into the deployed backend. Safe to run again.
 //
 //   node scripts/seed.mjs        (needs AWS credentials in the environment)
@@ -19,4 +19,4 @@ if (reply.FunctionError) {
   console.error('Seeding failed:', result.errorMessage ?? result);
   process.exit(1);
 }
-console.log(`Seeded ${result.challenges} suggested challenges (${result.created} new).`);
+console.log(`Seeded ${result.challenges} team challenges (${result.created} new).`);

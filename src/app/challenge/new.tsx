@@ -3,9 +3,11 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { LightPicker } from '@/components/pickers';
+import { CategoryPicker, LightPicker } from '@/components/pickers';
 import { BackBar, Button, Input, Label, Screen, Segmented, Title, useToast } from '@/components/ui';
-import { lightColor, type ChakraId } from '@/data/chakras';
+import { challengeColor } from '@/data/brand';
+import type { CategoryId } from '@/data/categories';
+import type { ChakraId } from '@/data/chakras';
 import { useCreateChallenge, type PickedAudio } from '@/lib/api/challenges';
 import type { MissedRule } from '@/lib/db.types';
 import { locale, t, type Locale, type TextKey } from '@/lib/i18n';
@@ -32,6 +34,7 @@ export default function NewChallengeScreen() {
   const [duration, setDuration] = useState('21');
   const [rule, setRule] = useState<MissedRule>('calendar');
   const [language, setLanguage] = useState<Locale>(locale);
+  const [category, setCategory] = useState<CategoryId>('other');
   const [light, setLight] = useState<ChakraId>('anahata');
   const [minutes, setMinutes] = useState('');
   const [link, setLink] = useState('');
@@ -72,6 +75,7 @@ export default function NewChallengeScreen() {
         duration_days: days,
         locale: language,
         missed_rule: rule,
+        category,
         light,
         timer_seconds: timerMinutes === null ? null : Math.max(10, Math.round(timerMinutes * 60)),
         link_url: url || null,
@@ -154,8 +158,14 @@ export default function NewChallengeScreen() {
         />
       </View>
 
-      <Label>{t('board.light')}</Label>
-      <LightPicker value={light} onChange={setLight} />
+      <Label>{t('new.category')}</Label>
+      <CategoryPicker value={category} onChange={setCategory} />
+      {category === 'chakras' ? (
+        <>
+          <Label>{t('new.light')}</Label>
+          <LightPicker value={light} onChange={setLight} />
+        </>
+      ) : null}
 
       <Text style={styles.section}>{t('new.eachDay')}</Text>
       <Text style={styles.sectionHint}>{t('new.eachDayHint')}</Text>
@@ -216,7 +226,7 @@ export default function NewChallengeScreen() {
         {problem && title !== '' ? <Text style={styles.problem}>{problem}</Text> : null}
         <Button
           label={t('new.publish')}
-          accent={lightColor(light)}
+          accent={challengeColor({ category, light })}
           busy={create.isPending}
           disabled={problem !== null}
           onPress={submit}

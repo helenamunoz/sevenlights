@@ -3,14 +3,17 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CoverArt } from '@/components/brand';
 import { challengeColor, challengeCover } from '@/data/brand';
+import { categoryOf } from '@/data/categories';
 import type { Progress } from '@/lib/days';
 import type { Challenge } from '@/lib/db.types';
-import { t } from '@/lib/i18n';
+import { t, tr } from '@/lib/i18n';
 import { alpha, color, font, radius, space } from '@/theme/tokens';
 
-/** "21 days · 5 min" — the facts of a challenge on one line. */
+/** "Breath · 21 days · 5 min" — the facts of a challenge on one line. */
 export function challengeFacts(challenge: Challenge): string {
-  const parts = [t('challenge.days', { n: challenge.duration_days })];
+  const category = categoryOf(challenge);
+  const parts = category.id === 'other' ? [] : [tr(category.name)];
+  parts.push(t('challenge.days', { n: challenge.duration_days }));
   if (challenge.timer_seconds) {
     parts.push(t('challenge.minutes', { n: Math.round(challenge.timer_seconds / 60) || 1 }));
   }

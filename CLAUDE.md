@@ -1,9 +1,12 @@
 # 7Lights — working notes
 
-A free app to raise your frequency with two tools: **vision boards** (seven
-chakra boards per person plus any number of free ones) and **challenges**
-(daily practices anyone can create and join). Built for Helena's iPhone; it
-also runs on Android and web.
+A free app to raise your frequency. **Challenges are the product**: daily
+practices of any kind (breath, meditation, movement, writing, rest, habits,
+chakras…) that anyone can create and join; a starter series is signed by the
+7Lights team. **Vision boards** are a second, optional tool (seven chakra
+boards per person plus any number of free ones). Chakras are one category
+among the others, not the frame. Built for Helena's iPhone; it also runs on
+Android and web.
 
 ## Shape of the thing
 
@@ -37,13 +40,14 @@ amplify/functions/api/handler.ts   every operation and who may do it
 amplify/functions/api/rules.ts     pure checks: limits, day bounds, vote rank
 amplify/functions/api/db.ts        DynamoDB helpers and the key layout
 amplify/functions/api/files.ts     S3: signed links, upload forms, copies
-amplify/functions/api/seed.ts      the suggested breathing challenge
+amplify/functions/api/seed.ts      the 7Lights team's challenges, es + en
 src/lib/aws.ts                     session, Cognito calls, read() and write()
 src/lib/auth.tsx                   AuthProvider: session, profile, isAdmin
 src/lib/api/*.ts                   react-query hooks the screens use
 src/lib/media.ts                   signed URLs for reading, uploads
 src/lib/days.ts                    day and streak maths (tests/days.test.mjs)
 src/lib/i18n/{es,en}.ts            both dictionaries
+src/data/categories.ts             the kinds of practice a challenge can be
 src/data/chakras.ts                the seven centers
 src/theme/tokens.ts                color / font / space scales
 tests/backend/                     the rules, tested against the deployed sandbox
@@ -65,6 +69,8 @@ tests/e2e/web.mjs                  a browser walk through the web build
   in `src/lib/api`, and a case in `tests/backend/rules.test.mjs` that proves who
   cannot do it.
 - No third-party affirmation texts in seed content.
+- Challenge texts promise no health outcomes: no "heal", "cure" or "treat".
+- A new category goes in `rules.ts` (CATEGORIES) and `src/data/categories.ts`, with the same id.
 - Borrowed photos and texts carry no credit.
 
 ## Running and checking

@@ -21,6 +21,7 @@ import {
 } from './db';
 import * as files from './files';
 import {
+  CATEGORIES,
   CHAKRAS,
   CHALLENGES_PER_DAY,
   COMMENTS_PER_DAY,
@@ -445,12 +446,18 @@ const reads: Record<string, Op> = {
   myLikes: async (_input, caller) =>
     (await query(`U#${caller.me}`, 'LIKE#')).map((like) => like.sk.slice(5)),
 
-  challenges: async ({ sort, language }, caller) => {
+  /** Community challenges, optionally of one category. */
+  challenges: async ({ sort, language, category }, caller) => {
     const locales = language === 'all' ? LOCALES : [oneOf(language, LOCALES, 'bad_locale')];
+    const wanted = category == null ? null : oneOf(category, CATEGORIES, 'bad_category');
     const pointers = (await Promise.all(locales.map((l) => query(`CHL#${l}`)))).flat();
     const found = await batchGet(pointers.map((p) => ({ pk: `CH#${p.sk}`, sk: 'A' })));
     const visible: Item[] = [];
-    for (const challenge of found) if (await seesChallenge(challenge, caller)) visible.push(challenge);
+    for (const challenge of found) {
+      // Challenges from before categories existed count as "other".
+      if (wanted && (challenge.category ?? 'other') !== wanted) continue;
+      if (await seesChallenge(challenge, caller)) visible.push(challenge);
+    }
     visible.sort(
       (a, b) =>
         (sort === 'top' ? b.rank - a.rank || b.member_count - a.member_count : 0) ||
@@ -825,13 +832,14 @@ const writes: Record<string, Op> = {
       sk: 'A',
       id: challengeId,
       creator_id: caller.me,
-      // Only the seed can mark a challenge as suggested by the app.
+      // Only the seed can mark a challenge as one from the 7Lights team.
       is_official: false,
       title: text(input.title, 80, 3, 'bad_title'),
       description: text(input.description ?? '', 1200, 0, 'bad_description'),
       duration_days: duration,
       locale: oneOf(input.locale ?? 'es', LOCALES, 'bad_locale'),
       missed_rule: oneOf(input.missed_rule ?? 'calendar', RULES, 'bad_rule'),
+      category: oneOf(input.category ?? 'other', CATEGORIES, 'bad_category'),
       light: oneOf(input.light ?? 'anahata', CHAKRAS, 'bad_light'),
       timer_seconds: timer(input.timer_seconds),
       audio_path: input.audio_path ?? null,

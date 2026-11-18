@@ -32,7 +32,7 @@ before(async () => {
 
 after(async () => {
   for (const user of [ana, bea, cam]) if (user) await removeUser(user);
-  await purgeChallenges([state.calendar, state.anyPace, state.strict]);
+  await purgeChallenges([state.calendar, state.anyPace, state.strict, state.walk]);
 });
 
 const chakraBoard = async (user, chakra) =>
@@ -216,6 +216,7 @@ test('challenges: what a creator can and cannot set', async () => {
 
   const created = await ana.read('challenge', { id: state.calendar });
   assert.equal(created.is_official, false, 'self-official');
+  assert.equal(created.category, 'other', 'no category given');
   assert.equal(created.rank, 0, 'forged rank');
   assert.equal(created.up_count, 0);
   assert.equal(created.member_count, 1, 'the creator is its first member');
@@ -235,6 +236,19 @@ test('challenges: what a creator can and cannot set', async () => {
     'bad_path'
   );
   await refused(bea.write('deleteChallenge', { id: state.calendar }), 'not_found');
+
+  // A category is one of the known kinds, and the list can be narrowed to one.
+  await refused(
+    ana.write('createChallenge', { ...base, title: 'Tipo', duration_days: 3, category: 'astrology' }),
+    'bad_category'
+  );
+  state.walk = await ana.write('createChallenge', { ...base, title: `Caminar ${run}`, duration_days: 3, category: 'movement' });
+  const moving = await bea.read('challenges', { sort: 'new', language: 'es', category: 'movement' });
+  assert.ok(moving.some((c) => c.id === state.walk));
+  assert.ok(moving.every((c) => c.category === 'movement'));
+  const rest = await bea.read('challenges', { sort: 'new', language: 'es', category: 'other' });
+  assert.ok(rest.some((c) => c.id === state.calendar) && !rest.some((c) => c.id === state.walk));
+  await refused(bea.read('challenges', { sort: 'new', language: 'es', category: 'astrology' }), 'bad_category');
 });
 
 test('joining: day 1 is the day you join, and cannot be backdated', async () => {
@@ -432,7 +446,7 @@ test('deleting an account removes its content and sign-in, and keeps others’ p
   await bea.write('updateProfile', { username: name('bea') });
 });
 
-test('seed: one suggested breathing challenge per language, safe to repeat', async () => {
+test('seed: the 7Lights team challenges, one per kind in each language, safe to repeat', async () => {
   const lambda = new LambdaClient({ region });
   for (let i = 0; i < 2; i++) {
     const reply = await lambda.send(
@@ -442,13 +456,18 @@ test('seed: one suggested breathing challenge per language, safe to repeat', asy
   }
   for (const locale of ['es', 'en']) {
     const suggested = await bea.read('suggestedChallenges', { locale });
-    assert.equal(suggested.length, 1);
-    assert.equal(suggested[0].is_official, true);
+    assert.equal(suggested.length, 7);
+    assert.ok(suggested.every((c) => c.is_official && c.creator_id === null));
+    assert.deepEqual(
+      suggested.map((c) => c.category),
+      ['breath', 'meditation', 'movement', 'writing', 'rest', 'habits', 'chakras']
+    );
+    assert.equal(suggested[0].id, `official-breathing-${locale}`);
     assert.equal(suggested[0].duration_days, 21);
     assert.equal(suggested[0].timer_seconds, 300);
     assert.equal((await bea.read('challengeDays', { id: suggested[0].id })).length, 4);
   }
-  // Suggested challenges are not mixed into the community list.
+  // Team challenges are not mixed into the community list.
   const community = await bea.read('challenges', { sort: 'top', language: 'all' });
   assert.equal(community.filter((c) => c.is_official).length, 0);
 });

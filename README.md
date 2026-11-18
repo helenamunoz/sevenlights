@@ -1,13 +1,17 @@
 # 7Lights
 
-A free app to raise your frequency, with two tools:
+A free app to raise your frequency through daily practice done in company:
 
-- **Vision boards.** Seven chakra boards per person, plus as many free boards
-  as you like. Public by default, with a private switch on each. Other people
-  can like a board and borrow from it: a photo, a text, or the whole page.
-- **Challenges.** Anyone can create one, of any length. Day 1 is the day you
-  join. Each day you tick it done and can leave a note. Comments and votes;
-  the best-voted ones rise.
+- **Challenges** are the heart of it and the first thing you see. Anyone can
+  create one, of any length and any kind of practice: breath, meditation,
+  movement, writing, rest, habits, chakras or anything else. Day 1 is the day
+  you join. Each day you tick it done and can leave a note. Comments and
+  votes; the best-voted ones rise. A starter series, one per kind of
+  practice, is signed by the 7Lights team.
+- **Vision boards** are a second, optional tool. Seven chakra boards per
+  person, plus as many free boards as you like. Public by default, with a
+  private switch on each. Other people can like a board and borrow from it: a
+  photo, a text, or the whole page.
 
 Spanish and English, following the phone's language. iPhone, Android and web.
 
@@ -59,7 +63,7 @@ You need Node 22 and AWS credentials for the account in your environment
 ```bash
 npm run backend                 # npx ampx sandbox --once --identifier main
 node scripts/write-env.mjs      # copies the three public values into .env
-npm run seed                    # the suggested breathing challenge, es + en
+npm run seed                    # the 7Lights team's challenges, es + en
 ```
 
 `npm run backend` is safe to run again after changing anything in `amplify/`;

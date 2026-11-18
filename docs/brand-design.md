@@ -54,7 +54,7 @@ The built-in chakra covers are decorative. A person’s photos take priority in 
 
 - **Sign-in.** Ember Ring and wordmark, one dusk-curtain collage, an email field, and a cream action.
 - **Boards.** Seven image-led rows in root-to-crown order. An open board pairs a cover and the existing intention, affirmation, words, and images.
-- **Challenges.** Art-led discovery cards, visible progress, and a clear daily action. Keep the numbered days available for opening previous entries. The official mindful breathing challenge uses the dusk art and mauve controls.
+- **Challenges.** Art-led discovery cards, visible progress, and a clear daily action. Keep the numbered days available for opening previous entries. Each kind of practice has its own cover and accent from the Afterglow palette; breath challenges use the dusk art and mauve controls, and chakra challenges take the color of their center.
 - **Breathing and check-in.** A translucent amber paper disc grows and settles behind a steady clock. Keep the timer controls separate. Pair the optional note with a clear share switch and a honey Done button for the breathing challenge.
 - **Explore and sharing.** Use a compact, two-column feed where it fits. Story cards use a 9:16 frame, the person’s own images and words where available, and a small Ember Ring lockup near the bottom.
 
