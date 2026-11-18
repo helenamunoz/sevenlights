@@ -144,7 +144,9 @@ function OwnBoard({ board }: { board: Board }) {
         <Field
           label={t('board.intention')}
           value={board.intention}
-          placeholder={board.chakra ? tr(CHAKRA_BY_ID[board.chakra].prompt) : t('board.intentionPlaceholder')}
+          placeholder={
+            board.chakra ? tr(CHAKRA_BY_ID[board.chakra].prompt) : board.prompt || t('board.intentionPlaceholder')
+          }
           accent={accent}
           onChange={(intention) => save({ intention })}
         />
@@ -190,9 +192,7 @@ function OwnBoard({ board }: { board: Board }) {
       />
       <Text style={styles.hint}>{t('board.autosave')}</Text>
 
-      {board.chakra === null ? (
-        <Button label={t('board.delete')} kind="danger" onPress={() => setDeleting(true)} style={styles.spaced} />
-      ) : null}
+      <Button label={t('board.delete')} kind="danger" onPress={() => setDeleting(true)} style={styles.spaced} />
 
       <ActionSheet
         visible={deleting}

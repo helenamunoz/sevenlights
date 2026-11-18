@@ -121,7 +121,7 @@ try {
     await page.getByText('Elegí uno para empezar.').waitFor();
     await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor({ timeout: 20_000 });
     await shot('05-home-challenges');
-    assert.equal((await me.read('boardsOf', { ownerId: me.id })).length, 7);
+    assert.equal((await me.read('boardsOf', { ownerId: me.id })).length, 0, 'no boards until you make one');
   });
 
   await step('the category chips narrow the list', async () => {
@@ -133,10 +133,27 @@ try {
     await page.locator('[aria-label="10 minutos de quietud"]').first().waitFor();
   });
 
-  await step('editing a board saves it', async () => {
+  await step('boards start from templates: a single board, then the chakra set', async () => {
     await page.getByText('Tableros', { exact: true }).last().click();
-    await page.getByText('Siete Luces').waitFor({ timeout: 20_000 });
-    await shot('05c-seven-boards');
+    await page.getByText('Todavía no tenés tableros.').waitFor({ timeout: 20_000 });
+    await page.getByText('Nuevo tablero', { exact: true }).click();
+    await page.getByText('Plantillas').waitFor({ timeout: 20_000 });
+    await shot('05c-board-templates');
+    await page.locator('[aria-label="Gratitud"]').click();
+    await page.getByPlaceholder('¿Qué de lo que ya tenés no querés dar por sentado?').waitFor({ timeout: 20_000 });
+    await shot('05d-board-from-template');
+    await page.getByLabel('Volver').first().click();
+    await page.getByText('Nuevo tablero', { exact: true }).click();
+    await page.locator('[aria-label="Los siete chakras"]').click();
+    await page.locator('[aria-label*="Centro 7"]').waitFor({ timeout: 30_000 });
+    await shot('05e-boards');
+    const boards = await me.read('boardsOf', { ownerId: me.id });
+    assert.equal(boards.length, 8);
+    assert.equal(boards.filter((board) => board.chakra).length, 7);
+    assert.equal(boards.find((board) => !board.chakra).title, 'Lo que ya tengo');
+  });
+
+  await step('editing a board saves it', async () => {
     await page.locator('[aria-label*="Centro 4"]').click();
     // A chakra board's first field is its intention; the placeholder is that chakra's own question.
     await page.getByText('Se guarda solo.').waitFor({ timeout: 20_000 });
@@ -175,8 +192,8 @@ try {
     await shot('10-copied-board');
     const boards = await me.read('boardsOf', { ownerId: me.id });
     assert.equal(boards.find((board) => board.chakra === 'vishuddha').intention, 'Vivir cerca del mar');
-    const copy = boards.find((board) => board.chakra === null);
-    assert.ok(copy, 'the copy is a new free board');
+    const copy = boards.find((board) => board.chakra === null && board.title !== 'Lo que ya tengo');
+    assert.ok(copy, 'the copy is a new board');
     assert.equal(copy.images.length, 1);
     assert.equal((await luz.read('board', { id: luzBoard })).like_count, 1);
   });
@@ -201,6 +218,25 @@ try {
     assert.equal(checkins.length, 1);
     assert.equal(checkins[0].day_number, 1);
     assert.equal(checkins[0].note, 'Cinco minutos tranquilos.');
+  });
+
+  await step('an invitation link survives signing in', async () => {
+    const guest = await browser.newContext({ locale: 'es-AR', viewport: { width: 414, height: 896 } });
+    await guest.grantPermissions(['clipboard-read', 'clipboard-write']);
+    const visit = await guest.newPage();
+    await visit.goto(`${base}/challenge/${luzChallenge}`);
+    await visit.getByText('Enviar código').waitFor({ timeout: 20_000 });
+    // Signing in happens in the same visit; the session lands in storage, as in the app.
+    await visit.evaluate((value) => localStorage.setItem('sevenlights.session.v1', value), stored);
+    await visit.goto(base);
+    await visit.getByText(challengeTitle).first().waitFor({ timeout: 20_000 });
+    assert.ok(visit.url().endsWith(`/challenge/${luzChallenge}`));
+    await visit.getByText('Invitar a alguien').click();
+    await visit.getByText('Invitación copiada.').waitFor();
+    const copied = await visit.evaluate(() => navigator.clipboard.readText());
+    assert.match(copied, new RegExp(`^Sumate a «${challengeTitle}» en 7Lights: https://.+/challenge/${luzChallenge}$`));
+    await visit.screenshot({ path: join(shots, '14b-invite.png') });
+    await guest.close();
   });
 
   await step('voting, commenting and reporting on a community challenge', async () => {
@@ -235,6 +271,7 @@ try {
     await signedOut.evaluate((value) => localStorage.setItem('sevenlights.session.v1', value), stored);
     await signedOut.reload();
     await signedOut.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
+    await signedOut.getByText('In progress').waitFor();
     await signedOut.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
     await signedOut.screenshot({ path: join(shots, '18-home-en.png') });
     // What people wrote is never translated.

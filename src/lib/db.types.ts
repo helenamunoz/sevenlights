@@ -34,6 +34,8 @@ export type Board = {
   owner_id: string;
   chakra: ChakraId | null;
   title: string;
+  /** The question a template left on the board; empty or missing otherwise. */
+  prompt?: string;
   light: ChakraId;
   intention: string;
   affirmation: string;

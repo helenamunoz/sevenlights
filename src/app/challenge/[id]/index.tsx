@@ -26,6 +26,7 @@ import { useMe } from '@/lib/auth';
 import type { Progress } from '@/lib/days';
 import type { Challenge, MissedRule } from '@/lib/db.types';
 import { t, type TextKey } from '@/lib/i18n';
+import { inviteTo } from '@/lib/invite';
 import { allowReminders, remindersSupported } from '@/lib/reminders';
 import { alpha, color, font, radius, space } from '@/theme/tokens';
 
@@ -195,6 +196,20 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
         </View>
       )}
 
+      <View style={styles.block}>
+        <Button
+          label={t('invite.button')}
+          kind="secondary"
+          onPress={() =>
+            inviteTo(challenge).then(
+              (done) => done === 'copied' && toast(t('invite.copied')),
+              () => toast(t('common.failed'))
+            )
+          }
+        />
+        <Text style={styles.inviteHint}>{t('invite.hint')}</Text>
+      </View>
+
       {!challenge.is_official ? (
         <View style={styles.block}>
           <Label>{t('challenge.vote')}</Label>
@@ -356,6 +371,7 @@ const styles = StyleSheet.create({
     marginTop: space.md,
   },
   title: { fontFamily: font.display, fontSize: 36, lineHeight: 41, color: color.text, marginTop: space.sm },
+  inviteHint: { fontFamily: font.body, fontSize: 13, lineHeight: 19, color: color.textFaint, marginTop: space.sm },
   official: {
     fontFamily: font.bodyBold,
     fontSize: 11,

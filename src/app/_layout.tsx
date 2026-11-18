@@ -7,7 +7,7 @@ import { InstrumentSans_700Bold } from '@expo-google-fonts/instrument-sans/700Bo
 import { NotoSerifDevanagari_400Regular } from '@expo-google-fonts/noto-serif-devanagari/400Regular';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -19,11 +19,14 @@ import { ReminderSync } from '@/components/reminder-sync';
 import { Button, ToastProvider } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { t } from '@/lib/i18n';
+import { rememberInvite, takeInvite } from '@/lib/invite';
 import { persistOptions, queryClient } from '@/lib/query';
 import { isConfigured } from '@/lib/aws';
 import { color, font, space } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
+// Before any guard redirects: the address may be an invitation to a challenge.
+rememberInvite();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -71,6 +74,18 @@ export default function RootLayout() {
  */
 function Routes() {
   const { ready, session, profile, profileLoading, profileFailed, retryProfile } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const inside = ready && !profileLoading && session !== null && profile !== null;
+
+  // Once the person is in, take them to the challenge they were invited to.
+  useEffect(() => {
+    if (!inside) return;
+    const invited = takeInvite();
+    if (invited && invited !== pathname) router.replace(invited as `/challenge/${string}`);
+    // Only when the door opens; later navigation is the person's own.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inside]);
 
   if (!ready || profileLoading) return <View style={styles.blank} />;
 

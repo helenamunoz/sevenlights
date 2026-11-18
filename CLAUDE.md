@@ -3,9 +3,11 @@
 A free app to raise your frequency. **Challenges are the product**: daily
 practices of any kind (breath, meditation, movement, writing, rest, habits,
 chakras…) that anyone can create and join; a starter series is signed by the
-7Lights team. **Vision boards** are a second, optional tool (seven chakra
-boards per person plus any number of free ones). Chakras are one category
-among the others, not the frame. Built for Helena's iPhone; it also runs on
+7Lights team, and every challenge has an invite link. **Vision boards** are a
+second, optional tool: nobody starts with any, and a new one comes from a
+blank page or a template (a year, life areas, a project, gratitude, the seven
+chakras). Chakras are one category and one template among the others, not the
+frame. Built for Helena's iPhone; it also runs on
 Android and web.
 
 ## Shape of the thing
@@ -48,7 +50,9 @@ src/lib/media.ts                   signed URLs for reading, uploads
 src/lib/days.ts                    day and streak maths (tests/days.test.mjs)
 src/lib/i18n/{es,en}.ts            both dictionaries
 src/data/categories.ts             the kinds of practice a challenge can be
+src/data/board-templates.ts        starting points for boards, chakras among them
 src/data/chakras.ts                the seven centers
+src/lib/invite.ts                  challenge invite links, kept across sign-in on the web
 src/theme/tokens.ts                color / font / space scales
 tests/backend/                     the rules, tested against the deployed sandbox
 tests/e2e/web.mjs                  a browser walk through the web build
@@ -70,6 +74,8 @@ tests/e2e/web.mjs                  a browser walk through the web build
   cannot do it.
 - No third-party affirmation texts in seed content.
 - Challenge texts promise no health outcomes: no "heal", "cure" or "treat".
+- Nothing about food, diets, fasting or weight: not in team challenges, and
+  the community rules forbid it in everyone's.
 - A new category goes in `rules.ts` (CATEGORIES) and `src/data/categories.ts`, with the same id.
 - Borrowed photos and texts carry no credit.
 

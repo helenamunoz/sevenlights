@@ -1,15 +1,17 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { BoardTemplate } from '@/data/board-templates';
 import type { ChakraId } from '@/data/chakras';
 import { useMe } from '@/lib/auth';
 import { read, write } from '@/lib/aws';
+import { tr } from '@/lib/i18n';
 import type { Board, BoardImage } from '@/lib/db.types';
 import { uploadBoardImage } from '@/lib/media';
 import type { PickedPhoto } from '@/lib/photos';
 
 // ── reading ──────────────────────────────────────────────────────────
 
-/** The signed-in person's boards: seven chakra pages, then their free boards. */
+/** The signed-in person's boards, oldest first. */
 export function useMyBoards() {
   const me = useMe();
   return useQuery({
@@ -101,6 +103,34 @@ export function useCreateBoard() {
   return useMutation({
     mutationFn: (input: { title: string; light: ChakraId }) => write<string>('createBoard', input),
     onSuccess: () => refresh(),
+  });
+}
+
+/**
+ * Makes a template's boards, in order, in the phone's language. Chakra boards
+ * the person already has are left as they are. Returns the new boards' ids.
+ */
+export function useCreateFromTemplate() {
+  const me = useMe();
+  const refresh = useRefreshBoards();
+  return useMutation({
+    mutationFn: async (template: BoardTemplate) => {
+      const mine = await boardsOf(me);
+      const ids: string[] = [];
+      for (const board of template.boards) {
+        if (board.chakra && mine.some((own) => own.chakra === board.chakra)) continue;
+        ids.push(
+          await write<string>('createBoard', {
+            title: tr(board.title),
+            prompt: tr(board.prompt),
+            light: board.light,
+            chakra: board.chakra ?? null,
+          })
+        );
+      }
+      return ids;
+    },
+    onSettled: () => refresh(),
   });
 }
 

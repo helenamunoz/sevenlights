@@ -8,11 +8,13 @@ import { useMyBoards } from '@/lib/api/boards';
 import { t } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
 
-/** Your own boards: the seven centers on their thread, then your free boards. */
+/** Your own vision boards. The chakra set, if you made it, keeps its root-to-crown thread. */
 export default function MyBoardsScreen() {
   const router = useRouter();
   const boards = useMyBoards();
-  const free = (boards.data ?? []).filter((board) => board.chakra === null);
+  const all = boards.data ?? [];
+  const centers = all.filter((board) => board.chakra !== null);
+  const others = all.filter((board) => board.chakra === null);
 
   return (
     <Screen
@@ -26,16 +28,33 @@ export default function MyBoardsScreen() {
         <Text style={styles.subtitle}>{t('boards.subtitle')}</Text>
       </View>
 
-      {boards.isPending ? <Loading /> : <ChakraColumn boards={boards.data ?? []} showPrompts />}
+      {boards.isPending ? <Loading /> : null}
       {boards.isError && !boards.data ? <Empty>{t('common.loadFailed')}</Empty> : null}
 
-      <View style={styles.free}>
-        <Label>{t('boards.free')}</Label>
-        {free.length === 0 && !boards.isPending ? <Empty>{t('boards.freeEmpty')}</Empty> : null}
-        {free.map((board) => (
-          <BoardCard key={board.id} board={board} />
-        ))}
-        <Button label={t('boards.new')} kind="secondary" onPress={() => router.push('/board/new')} />
+      {others.length ? (
+        <View style={styles.group}>
+          {others.map((board) => (
+            <BoardCard key={board.id} board={board} />
+          ))}
+        </View>
+      ) : null}
+
+      {centers.length ? (
+        <>
+          <View style={styles.label}>
+            <Label>{t('boards.chakras')}</Label>
+          </View>
+          <ChakraColumn boards={centers} showPrompts />
+        </>
+      ) : null}
+
+      <View style={styles.group}>
+        {boards.isSuccess && all.length === 0 ? <Empty>{t('boards.empty')}</Empty> : null}
+        <Button
+          label={t('boards.new')}
+          kind={all.length === 0 ? 'primary' : 'secondary'}
+          onPress={() => router.push('/board/new')}
+        />
       </View>
     </Screen>
   );
@@ -66,5 +85,6 @@ const styles = StyleSheet.create({
     marginTop: space.md,
     maxWidth: 320,
   },
-  free: { paddingHorizontal: space.lg, marginTop: space.xl },
+  group: { paddingHorizontal: space.lg, marginBottom: space.md },
+  label: { paddingHorizontal: space.lg },
 });

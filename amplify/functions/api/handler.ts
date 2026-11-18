@@ -120,6 +120,7 @@ function newBoard(owner: string, fields: Item, createdAt = now()): Item {
     owner_id: owner,
     chakra: null,
     title: '',
+    prompt: '',
     light: 'sahasrara',
     intention: '',
     affirmation: '',
@@ -585,14 +586,10 @@ const reads: Record<string, Op> = {
 // ── writes ───────────────────────────────────────────────────────────
 
 const writes: Record<string, Op> = {
-  /** Creates the profile and, with it, the seven chakra boards. */
+  /** Creates the profile. Boards are made later, one by one or from a template. */
   createProfile: async (input, caller) => {
     const name = validUsername(input.username);
     const stamp = Date.now();
-    const boards = CHAKRAS.map((chakra, index) =>
-      // A millisecond apart, so they always list from root to crown.
-      newBoard(caller.me, { chakra, light: chakra }, new Date(stamp + index).toISOString())
-    );
     const failed = await transact([
       tx.put({ pk: `UN#${name}`, sk: 'UN', user_id: caller.me }, true),
       tx.put(
@@ -609,7 +606,6 @@ const writes: Record<string, Op> = {
         },
         true
       ),
-      ...boards.flatMap((board) => [tx.put(board), tx.put(boardPointer(board))]),
     ]);
     if (failed === 0) refuse('username-taken');
     if (failed !== null) refuse('profile_exists');
@@ -671,10 +667,23 @@ const writes: Record<string, Op> = {
     return refuse('bad_kind');
   },
 
+  /**
+   * A board of any theme. With `chakra` it is that center's board, and a
+   * person has at most one of each. `prompt` is the question a template
+   * leaves on the empty board.
+   */
   createBoard: async (input, caller) => {
+    const chakra = input.chakra == null ? null : oneOf(input.chakra, CHAKRAS, 'bad_chakra');
+    if (chakra) {
+      const pointers = await query(`U#${caller.me}`, 'BOARD#');
+      const mine = await batchGet(pointers.map((p) => ({ pk: `BOARD#${p.sk.slice(6)}`, sk: 'A' })));
+      if (mine.some((board) => board.chakra === chakra)) refuse('chakra_taken');
+    }
     const board = newBoard(caller.me, {
+      chakra,
       title: text(input.title ?? '', 60, 0, 'bad_title'),
-      light: oneOf(input.light ?? 'sahasrara', CHAKRAS, 'bad_light'),
+      light: chakra ?? oneOf(input.light ?? 'sahasrara', CHAKRAS, 'bad_light'),
+      prompt: text(input.prompt ?? '', 200, 0, 'bad_prompt'),
     });
     await transact([tx.put(board), tx.put(boardPointer(board))]);
     return board.id;
@@ -698,10 +707,8 @@ const writes: Record<string, Op> = {
     return null;
   },
 
-  /** Free boards only: the seven chakra boards stay for as long as the account does. */
   deleteBoard: async ({ id }, caller) => {
     const board = await myBoard(id, caller);
-    if (board.chakra) refuse('chakra_board');
     const paths = await deleteBoardRows(board.id);
     await remove(`U#${caller.me}`, `BOARD#${board.id}`);
     await files.removeMany(paths);

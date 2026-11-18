@@ -6,10 +6,12 @@ A free app to raise your frequency through daily practice done in company:
   create one, of any length and any kind of practice: breath, meditation,
   movement, writing, rest, habits, chakras or anything else. Day 1 is the day
   you join. Each day you tick it done and can leave a note. Comments and
-  votes; the best-voted ones rise. A starter series, one per kind of
+  votes; the best-voted ones rise. Every challenge has an invite link that
+  opens it on the web, also for someone who has yet to sign up. A starter series, one per kind of
   practice, is signed by the 7Lights team.
-- **Vision boards** are a second, optional tool. Seven chakra boards per
-  person, plus as many free boards as you like. Public by default, with a
+- **Vision boards** are a second, optional tool. Start one from a blank page
+  or a template: a year, life areas, a project, gratitude, or the seven
+  chakras. Public by default, with a
   private switch on each. Other people can like a board and borrow from it: a
   photo, a text, or the whole page.
 
@@ -34,6 +36,9 @@ To try a local build in a browser instead:
 ```bash
 npm run web:preview      # builds the web app and serves it on http://localhost:8080
 ```
+
+`EXPO_PUBLIC_WEB_URL` in `.env` is where invitation links point; change it if
+the web app moves.
 
 Optional: put the app's Instagram profile in `.env` as
 `EXPO_PUBLIC_INSTAGRAM_URL=https://www.instagram.com/...` to show the

@@ -38,17 +38,23 @@ after(async () => {
 const chakraBoard = async (user, chakra) =>
   (await user.read('boardsOf', { ownerId: user.id })).find((board) => board.chakra === chakra);
 
-test('profiles: seven chakra boards, unique and well-formed usernames', async () => {
+const CHAKRAS = ['muladhara', 'svadhisthana', 'manipura', 'anahata', 'vishuddha', 'ajna', 'sahasrara'];
+
+test('profiles: no boards to begin with, unique and well-formed usernames', async () => {
   assert.equal((await ana.read('me')).profile, null);
   await refused(ana.write('createProfile', { username: 'Bad Name', display_name: 'X' }), 'bad_username');
   await refused(ana.write('createProfile', { username: 'admin', display_name: 'X' }), 'bad_username');
   await ana.write('createProfile', { username: name('ana'), display_name: 'Ana' });
+  assert.equal((await ana.read('boardsOf', { ownerId: ana.id })).length, 0);
+
+  // The chakra template: one board per center, in order, and never two of the same.
+  for (const chakra of CHAKRAS) await ana.write('createBoard', { chakra, light: 'anahata', prompt: 'x' });
   const boards = await ana.read('boardsOf', { ownerId: ana.id });
-  assert.equal(boards.length, 7);
-  assert.deepEqual(
-    boards.map((board) => board.chakra),
-    ['muladhara', 'svadhisthana', 'manipura', 'anahata', 'vishuddha', 'ajna', 'sahasrara']
-  );
+  assert.deepEqual(boards.map((board) => board.chakra), CHAKRAS);
+  assert.deepEqual(boards.map((board) => board.light), CHAKRAS, 'a chakra board takes its own color');
+  await refused(ana.write('createBoard', { chakra: 'ajna' }), 'chakra_taken');
+  await refused(ana.write('createBoard', { chakra: 'astral' }), 'bad_chakra');
+  await refused(ana.write('createBoard', { title: 'Largo', prompt: 'x'.repeat(201) }), 'bad_prompt');
   await refused(bea.write('createProfile', { username: name('ana'), display_name: 'Bea' }), 'username-taken');
   await bea.write('createProfile', { username: name('bea'), display_name: 'Bea' });
   await cam.write('createProfile', { username: name('cam'), display_name: 'Cam' });
@@ -93,13 +99,18 @@ test('boards: counters and hidden flags are out of reach; photos only in your ow
   }
   assert.equal((await ana.read('board', { id: vishuddha.id })).image_count, 1);
 
-  // A created board is always a free one, whatever the request says.
-  const free = await ana.write('createBoard', { title: 'Libre', light: 'ajna', chakra: 'ajna', like_count: 5 });
+  // A new board starts from zero whatever the request says, and keeps its template's question.
+  const free = await ana.write('createBoard', { title: 'Libre', light: 'ajna', prompt: '¿Para qué?', like_count: 5 });
   const created = await ana.read('board', { id: free });
   assert.equal(created.chakra, null);
+  assert.equal(created.prompt, '¿Para qué?');
   assert.equal(created.like_count, 0);
   await ana.write('deleteBoard', { id: free });
-  await refused(ana.write('deleteBoard', { id: anahata.id }), 'chakra_board');
+  // Any board is its owner's to delete, a chakra one included, and only its owner's.
+  const root = await bea.write('createBoard', { chakra: 'muladhara' });
+  await refused(ana.write('deleteBoard', { id: root }), 'not_found');
+  await bea.write('deleteBoard', { id: root });
+  assert.equal((await bea.read('boardsOf', { ownerId: bea.id })).length, 0);
 
   // No file, no row; and the address handed out accepts only what it was made for.
   await refused(ana.write('addImage', { boardId: vishuddha.id, id: 'never-uploaded' }), 'file_missing');

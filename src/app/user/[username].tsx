@@ -62,7 +62,7 @@ export default function UserScreen() {
 
       {free.length ? (
         <View style={styles.padded}>
-          <Label>{t('boards.free')}</Label>
+          {centers.length ? <Label>{t('boards.free')}</Label> : null}
           {free.map((board) => (
             <BoardCard key={board.id} board={board} />
           ))}
