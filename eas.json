@@ -1,0 +1,22 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "production": {
+      "channel": "production",
+      "environment": "production",
+      "autoIncrement": true,
+      "ios": { "resourceClass": "default" }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6807111853",
+        "bundleIdentifier": "com.helena.sevenlights"
+      }
+    }
+  }
+}

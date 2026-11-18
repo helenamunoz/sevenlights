@@ -104,6 +104,28 @@ npx eas-cli update --branch preview --environment preview --message "<what chang
   with the SDK.
 - Give Helena the update's dashboard link (Preview → QR) when done.
 
+## TestFlight (iOS)
+
+**Claude handles TestFlight builds too**, with the App Store Connect key in the
+environment; Helena does not need to do anything in Apple's sites for a build.
+
+```bash
+scripts/testflight.sh     # EAS build for iOS, then auto-submit to TestFlight
+```
+
+- App Store Connect app: **SevenLights**, Apple ID `6807111853`, bundle
+  `com.helena.sevenlights` (both in `eas.json`; ignore the `APPLE_BUNDLE_ID`
+  and `APPLE_APP_APPLE_ID` variables if they say anything else).
+- The working key is the `ASC_*` set (`ASC_KEY_ID`, `ASC_ISSUER_ID`,
+  `ASC_PRIVATE_KEY`); `APPLE_API_*` is rejected by Apple. `scripts/asc-key.mjs`
+  tests them, writes the `.p8` to a temp file and exports `EXPO_ASC_*`.
+- `APPLE_TEAM_ID` becomes `EXPO_APPLE_TEAM_ID`. Build numbers increment on EAS
+  (`appVersionSource: remote`). The free EAS plan allows ~15 iOS builds a month.
+- Builds use the `production` EAS environment: its `EXPO_PUBLIC_*` values must
+  match the `preview` ones.
+- Only Helena can create a new app in App Store Connect, accept Apple's
+  agreements, or handle payments and two-factor prompts.
+
 ## Known gaps — good next tasks
 
 1. **A real phone pass**: the emailed code arriving and being accepted, camera
