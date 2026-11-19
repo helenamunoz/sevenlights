@@ -39,7 +39,7 @@ Chakra colors remain functional. Green identifies Heart and may appear in its th
 | Wordmark and primary titles | Bricolage Grotesque ExtraBold | Compact, soft-edged headings |
 | Card headings | Bricolage Grotesque Bold | Strong hierarchy at small sizes |
 | Body and controls | Instrument Sans Regular, Medium, Bold | Comfortable reading, distinct actions |
-| Prompts and quotations | Instrument Sans Italic | Occasional emphasis |
+| Prompts, intentions, closing lines | Cormorant Garamond Medium Italic | The contemplative voice; set about a fifth larger than the sans beside it |
 | Chakra seed syllables | Noto Serif Devanagari | Preserve the original script |
 
 Use the numeric timer as a stable focal point. Allow long names and localized labels to wrap. At larger system font sizes, give lists more room and let Explore use one column.
@@ -64,6 +64,8 @@ The built-in chakra covers are decorative. A person’s photos take priority in 
 - **Signature.** Seven small dots in ring order sit under screen titles.
 - **Today’s light.** Each weekday carries one of the seven colors, a word and a line; home shows it with tonight’s moon phase.
 - **A day done.** The seven lights open outward once and a closing line appears, with its own words on days 1, 7, 21, 40 and the last day.
+- **Home sky.** A soft wash of today’s color sits behind the home header and fades out on every side.
+- **Quiet places.** An empty list shows seven rays around a still center above its line of text.
 - With reduced motion on, the ring is still and the bloom does not play.
 
 Production art is in [assets/brand](../assets/brand). Platform icons are in [assets/images](../assets/images). Use the current in-app components and shared tokens when translating a mockup to code.

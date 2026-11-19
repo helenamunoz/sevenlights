@@ -14,7 +14,7 @@ export function TodayCard() {
   return (
     <View style={[styles.card, { borderColor: alpha(light.color, 0.3) }]}>
       <View style={styles.glow}>
-        <Aura color={light.color} size={72} intensity={1.4} />
+        <Aura color={light.glow ?? light.color} size={72} intensity={1.6} />
       </View>
       <View style={styles.body}>
         <Text style={styles.label}>{t('today.label')}</Text>
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     color: color.textFaint,
   },
   word: { fontFamily: font.display, fontSize: 24, lineHeight: 29 },
-  line: { fontFamily: font.displayItalic, fontSize: 15, lineHeight: 22, color: color.textSoft },
+  line: { fontFamily: font.displayItalic, fontSize: 18, lineHeight: 25, color: color.textSoft },
   moon: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.xs },
   moonName: { fontFamily: font.bodyMedium, fontSize: 12, color: color.textFaint },
 });

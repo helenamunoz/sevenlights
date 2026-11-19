@@ -1,5 +1,6 @@
 import { BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque/700Bold';
 import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque/800ExtraBold';
+import { CormorantGaramond_500Medium_Italic } from '@expo-google-fonts/cormorant-garamond/500Medium_Italic';
 import { InstrumentSans_400Regular } from '@expo-google-fonts/instrument-sans/400Regular';
 import { InstrumentSans_400Regular_Italic } from '@expo-google-fonts/instrument-sans/400Regular_Italic';
 import { InstrumentSans_500Medium } from '@expo-google-fonts/instrument-sans/500Medium';
@@ -33,6 +34,7 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_700Bold,
     BricolageGrotesque_800ExtraBold,
+    CormorantGaramond_500Medium_Italic,
     InstrumentSans_400Regular,
     InstrumentSans_400Regular_Italic,
     InstrumentSans_500Medium,

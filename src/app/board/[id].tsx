@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bijaText: { fontFamily: font.deva, fontSize: 34, lineHeight: 46 },
-  bijaSilence: { fontFamily: font.displayItalic, fontSize: 14 },
+  bijaSilence: { fontFamily: font.displayItalic, fontSize: 17 },
   freeDot: { width: 16, height: 16, borderRadius: 8 },
   heading: { flex: 1, paddingTop: space.xs },
   number: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   },
   spaced: { marginTop: space.xl },
   readText: { fontFamily: font.display, fontSize: 20, lineHeight: 29, color: color.text },
-  readItalic: { fontFamily: font.displayItalic, fontSize: 22 },
+  readItalic: { fontFamily: font.displayItalic, fontSize: 26 },
   borrowable: { marginBottom: space.lg },
   borrowableTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   borrow: { fontFamily: font.bodyMedium, fontSize: 12, color: color.textSoft, textDecorationLine: 'underline' },

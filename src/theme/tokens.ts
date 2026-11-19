@@ -31,7 +31,8 @@ export const color = {
 
 export const font = {
   display: 'BricolageGrotesque_800ExtraBold',
-  displayItalic: 'InstrumentSans_400Regular_Italic',
+  /** The contemplative voice: prompts, intentions, closing lines. A serif, set a size up. */
+  displayItalic: 'CormorantGaramond_500Medium_Italic',
   displayMedium: 'BricolageGrotesque_700Bold',
   body: 'InstrumentSans_400Regular',
   bodyMedium: 'InstrumentSans_500Medium',

@@ -76,6 +76,8 @@ tests/e2e/web.mjs                  a browser walk through the web build
 - Waiting is shown with `EmberLoader` (via `Loading` and busy buttons), never
   the system spinner. Motion respects the device's reduce-motion setting.
 - Fonts: Bricolage Grotesque for headings, Instrument Sans for body and UI,
+  Cormorant Garamond italic (`font.displayItalic`) for the contemplative voice
+  (prompts, intentions, closing lines; set about a fifth larger than the sans),
   and Noto Serif Devanagari for seed syllables.
 - Text fields keep a local draft and commit on blur (`components/field.tsx`).
 - **Never log what people write.** The function logs operation names and error

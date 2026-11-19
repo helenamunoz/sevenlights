@@ -5,11 +5,17 @@
  */
 import type { Locale } from '@/lib/i18n';
 import type { MoonPhase } from '@/lib/moon';
-import { afterglow } from '@/theme/tokens';
+import { afterglow, mix } from '@/theme/tokens';
 
 type Copy = Record<Locale, string>;
 
-export type DayLight = { color: string; word: Copy; line: Copy };
+export type DayLight = {
+  color: string;
+  /** For lights too pale to glow on the dark page: a warmer tone for the halo. */
+  glow?: string;
+  word: Copy;
+  line: Copy;
+};
 
 /** Indexed by Date.getDay(): Sunday first. The colors follow the ring from Monday. */
 export const DAY_LIGHTS: DayLight[] = [
@@ -35,6 +41,7 @@ export const DAY_LIGHTS: DayLight[] = [
   },
   {
     color: afterglow.cream,
+    glow: mix(afterglow.cream, afterglow.honey, 0.55),
     word: { es: 'Apertura', en: 'Openness' },
     line: { es: 'Dejá una puerta abierta a lo que no planeaste.', en: 'Leave one door open for what you did not plan.' },
   },

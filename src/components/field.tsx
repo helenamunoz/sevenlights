@@ -81,5 +81,5 @@ const styles = StyleSheet.create({
     padding: 0,
     minHeight: 29,
   },
-  inputItalic: { fontFamily: font.displayItalic, fontSize: 22 },
+  inputItalic: { fontFamily: font.displayItalic, fontSize: 26 },
 });

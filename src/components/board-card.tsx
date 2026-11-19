@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
   dot: { width: 9, height: 9, borderRadius: 5 },
   name: { flex: 1, fontFamily: font.display, fontSize: 21, lineHeight: 26, color: color.text },
   meta: { fontFamily: font.bodyMedium, fontSize: 12, color: color.textSoft },
-  line: { fontFamily: font.displayItalic, fontSize: 16, lineHeight: 23, color: color.textSoft },
+  line: { fontFamily: font.displayItalic, fontSize: 19, lineHeight: 26, color: color.textSoft },
   owner: { marginTop: 2 },
 });

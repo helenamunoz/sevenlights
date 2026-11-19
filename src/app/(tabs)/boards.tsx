@@ -3,8 +3,7 @@ import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { BoardCard } from '@/components/board-card';
 import { ChakraColumn } from '@/components/chakra-column';
-import { SevenDots } from '@/components/ember';
-import { Button, Empty, Label, Loading, Screen } from '@/components/ui';
+import { Button, Empty, Label, Loading, Screen, Title } from '@/components/ui';
 import { useMyBoards } from '@/lib/api/boards';
 import { t } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
@@ -24,9 +23,7 @@ export default function MyBoardsScreen() {
         <RefreshControl refreshing={boards.isRefetching} onRefresh={boards.refetch} tintColor={color.textFaint} />
       }>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>{t('boards.eyebrow')}</Text>
-        <Text style={styles.title}>{t('boards.title')}</Text>
-        <SevenDots />
+        <Title eyebrow={t('boards.eyebrow')}>{t('boards.title')}</Title>
         <Text style={styles.subtitle}>{t('boards.subtitle')}</Text>
       </View>
 
@@ -63,30 +60,8 @@ export default function MyBoardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: space.lg, marginTop: space.lg, marginBottom: space.lg },
-  eyebrow: {
-    fontFamily: font.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 2.4,
-    textTransform: 'uppercase',
-    color: color.textFaint,
-  },
-  title: {
-    fontFamily: font.display,
-    fontSize: 52,
-    lineHeight: 56,
-    color: color.text,
-    marginTop: space.sm,
-    letterSpacing: -1,
-  },
-  subtitle: {
-    fontFamily: font.body,
-    fontSize: 15,
-    lineHeight: 23,
-    color: color.textSoft,
-    marginTop: space.md,
-    maxWidth: 320,
-  },
+  header: { paddingHorizontal: space.lg, marginBottom: space.lg },
+  subtitle: { fontFamily: font.body, fontSize: 15, lineHeight: 23, color: color.textSoft, maxWidth: 320 },
   group: { paddingHorizontal: space.lg, marginBottom: space.md },
   label: { paddingHorizontal: space.lg },
 });

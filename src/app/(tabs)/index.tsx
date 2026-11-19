@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
@@ -8,6 +9,7 @@ import { CategoryPicker } from '@/components/pickers';
 import { TodayCard } from '@/components/today-card';
 import { Button, Empty, Label, Loading, Screen, Segmented, Title } from '@/components/ui';
 import { categoryOf, type CategoryId } from '@/data/categories';
+import { DAY_LIGHTS } from '@/data/daily';
 import { LEVELS, levelOf } from '@/data/levels';
 import {
   useChallenges,
@@ -18,7 +20,7 @@ import {
 } from '@/lib/api/challenges';
 import { progress } from '@/lib/days';
 import { LANGUAGES, locale, t, tr, type Locale } from '@/lib/i18n';
-import { color, font, space } from '@/theme/tokens';
+import { alpha, color, font, space } from '@/theme/tokens';
 
 /**
  * Home. The challenges you are doing, then what to join next: the 7Lights
@@ -42,6 +44,8 @@ export default function ChallengesScreen() {
   );
   const others = (community.data ?? []).filter((c) => !joined.has(c.id));
 
+  const today = DAY_LIGHTS[new Date().getDay()];
+  const sky = today.glow ?? today.color;
   const paths = pathsFrom(team.data ?? []);
   const completed = new Set(
     (memberships.data ?? [])
@@ -69,6 +73,12 @@ export default function ChallengesScreen() {
       refreshControl={
         <RefreshControl refreshing={community.isRefetching} onRefresh={refresh} tintColor={color.textFaint} />
       }>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[alpha(sky, 0), alpha(sky, 0.2), alpha(sky, 0.07), alpha(sky, 0)]}
+        locations={[0, 0.3, 0.7, 1]}
+        style={styles.sky}
+      />
       <Title eyebrow={t('challenges.eyebrow')}>{t('challenges.title')}</Title>
       <TodayCard />
 
@@ -160,6 +170,8 @@ export default function ChallengesScreen() {
 
 const styles = StyleSheet.create({
   section: { marginBottom: space.lg },
+  // Behind the header, edge to edge. It fades in as well as out, so it has no top edge.
+  sky: { position: 'absolute', top: 0, left: -space.lg, right: -space.lg, height: 460 },
   filters: { gap: space.sm, marginBottom: space.md },
   level: { fontFamily: font.display, fontSize: 24, lineHeight: 30, color: color.text, marginTop: space.sm },
   levelAbout: {

@@ -52,6 +52,7 @@ function DayView({ challenge, day }: { challenge: Challenge; day: number }) {
   const days = useChallengeDays(challenge.id);
   const { progress, checkins } = useMyProgress(challenge);
   const [justDone, setJustDone] = useState(false);
+  const router = useRouter();
 
   // A day's own settings win over the challenge's defaults.
   const own = days.data?.find((d) => d.day_number === day);
@@ -69,6 +70,16 @@ function DayView({ challenge, day }: { challenge: Challenge; day: number }) {
         {t('challenge.dayOf', { day, total: challenge.duration_days })}
       </Text>
 
+      {checkin ? (
+        <View style={styles.closingBlock}>
+          {/* Ticked a moment ago, on this screen: the bloom, and a way back. */}
+          {justDone ? <Bloom /> : null}
+          <Text style={[styles.done, { color: checkInAccent }]}>✓ {t('day.done')}</Text>
+          <Text style={styles.closing}>{tr(closingFor(day, challenge.duration_days))}</Text>
+          {justDone ? <Button label={t('day.continue')} accent={checkInAccent} onPress={() => router.back()} /> : null}
+        </View>
+      ) : null}
+
       {own?.body ? <Text style={styles.body}>{own.body}</Text> : null}
       {timer ? <DayTimer key={`${challenge.id}:${day}:${timer}`} seconds={timer} accent={accent} paper={breathing} /> : null}
       {audio ? <AudioPlayer path={audio} accent={accent} /> : null}
@@ -84,7 +95,7 @@ function DayView({ challenge, day }: { challenge: Challenge; day: number }) {
       <View style={styles.finish}>
         {breathing && (checkin || open) ? <CoverArt source={artwork.notebook} style={styles.cover} /> : null}
         {checkin ? (
-          <Done challenge={challenge} checkin={checkin} accent={checkInAccent} fresh={justDone} />
+          <Done challenge={challenge} checkin={checkin} accent={checkInAccent} />
         ) : open ? (
           <Tick
             challenge={challenge}
@@ -151,15 +162,11 @@ function Done({
   challenge,
   checkin,
   accent,
-  fresh,
 }: {
   challenge: Challenge;
   checkin: Checkin;
   accent: string;
-  /** Ticked a moment ago, on this screen: time for the bloom and a way back. */
-  fresh: boolean;
 }) {
-  const router = useRouter();
   const toast = useToast();
   const update = useUpdateNote();
   const undo = useUndoCheckIn();
@@ -169,14 +176,6 @@ function Done({
 
   return (
     <>
-      <View>
-        {fresh ? <Bloom /> : null}
-        <Text style={[styles.done, { color: accent }]}>✓ {t('day.done')}</Text>
-        <Text style={styles.closing}>{tr(closingFor(checkin.day_number, challenge.duration_days))}</Text>
-      </View>
-      {fresh ? (
-        <Button label={t('day.continue')} accent={accent} onPress={() => router.back()} style={styles.continue} />
-      ) : null}
       <NoteFields note={note} setNote={setNote} shared={shared} setShared={setShared} accent={accent} />
       {changed ? (
         <Button
@@ -252,8 +251,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: font.display, fontSize: 36, lineHeight: 41, color: color.text, marginTop: space.sm },
   body: {
     fontFamily: font.displayItalic,
-    fontSize: 22,
-    lineHeight: 32,
+    fontSize: 26,
+    lineHeight: 36,
     color: color.text,
     marginTop: space.xl,
     marginBottom: space.md,
@@ -264,12 +263,12 @@ const styles = StyleSheet.create({
   done: { fontFamily: font.bodyBold, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', marginBottom: space.sm },
   closing: {
     fontFamily: font.displayItalic,
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 24,
+    lineHeight: 32,
     color: color.text,
     marginBottom: space.lg,
   },
-  continue: { marginBottom: space.lg },
-  closed: { fontFamily: font.displayItalic, fontSize: 17, lineHeight: 25, color: color.textFaint },
+  closingBlock: { marginTop: space.lg, marginBottom: space.sm },
+  closed: { fontFamily: font.displayItalic, fontSize: 20, lineHeight: 28, color: color.textFaint },
   gap: { height: space.md },
 });

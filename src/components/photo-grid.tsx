@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
   zoomImage: { flex: 1, borderRadius: radius.md },
   caption: {
     fontFamily: font.displayItalic,
-    fontSize: 17,
-    lineHeight: 24,
+    fontSize: 20,
+    lineHeight: 27,
     color: color.text,
     textAlign: 'center',
   },

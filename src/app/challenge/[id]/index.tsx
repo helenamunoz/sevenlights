@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     marginTop: space.md,
   },
   title: { fontFamily: font.display, fontSize: 36, lineHeight: 41, color: color.text, marginTop: space.sm },
-  path: { fontFamily: font.bodyMedium, fontSize: 13, color: color.textSoft, marginTop: space.xs },
+  path: { fontFamily: font.bodyMedium, fontSize: 13, lineHeight: 19, color: color.textSoft, marginTop: space.sm },
   next: { marginBottom: space.sm },
   inviteHint: { fontFamily: font.body, fontSize: 13, lineHeight: 19, color: color.textFaint, marginTop: space.sm },
   official: {
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   },
   creator: { marginTop: space.md, alignSelf: 'flex-start' },
   description: { fontFamily: font.body, fontSize: 16, lineHeight: 25, color: color.textSoft, marginTop: space.lg },
-  rule: { fontFamily: font.displayItalic, fontSize: 15, lineHeight: 22, color: color.textFaint, marginTop: space.md },
+  rule: { fontFamily: font.displayItalic, fontSize: 18, lineHeight: 25, color: color.textFaint, marginTop: space.md },
   warning: {
     fontFamily: font.body,
     fontSize: 14,

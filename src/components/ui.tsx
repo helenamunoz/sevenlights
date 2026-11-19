@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { EmberLoader, SevenDots } from '@/components/ember';
+import { EmberLoader, SevenDots, SevenRays } from '@/components/ember';
 import { t } from '@/lib/i18n';
 import { alpha, color, font, radius, space } from '@/theme/tokens';
 
@@ -98,7 +98,12 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
 
 /** What a list shows when there is nothing in it yet. */
 export function Empty({ children }: { children: string }) {
-  return <Text style={styles.empty}>{children}</Text>;
+  return (
+    <View style={styles.emptyWrap}>
+      <SevenRays />
+      <Text style={styles.empty}>{children}</Text>
+    </View>
+  );
 }
 
 export function Loading() {
@@ -290,7 +295,7 @@ const styles = StyleSheet.create({
   },
   backBarRight: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   back: { fontFamily: font.body, fontSize: 14, color: color.textSoft },
-  titleWrap: { marginTop: space.md, marginBottom: space.lg },
+  titleWrap: { marginTop: space.lg, marginBottom: space.lg },
   eyebrow: {
     fontFamily: font.bodyMedium,
     fontSize: 11,
@@ -299,13 +304,14 @@ const styles = StyleSheet.create({
     color: color.textFaint,
     marginBottom: space.sm,
   },
-  title: { fontFamily: font.display, fontSize: 38, lineHeight: 43, color: color.text, letterSpacing: -0.5 },
+  title: { fontFamily: font.display, fontSize: 40, lineHeight: 45, color: color.text, letterSpacing: -0.8 },
   label: {
     fontFamily: font.bodyMedium,
-    fontSize: 10,
-    letterSpacing: 1.8,
+    fontSize: 11,
+    letterSpacing: 2,
     textTransform: 'uppercase',
     color: color.textFaint,
+    marginTop: space.sm,
     marginBottom: space.sm,
   },
   card: {
@@ -315,12 +321,14 @@ const styles = StyleSheet.create({
     borderColor: color.line,
     padding: space.lg,
   },
+  emptyWrap: { alignItems: 'center', gap: space.md, paddingVertical: space.xl },
   empty: {
     fontFamily: font.displayItalic,
-    fontSize: 16,
-    lineHeight: 24,
-    color: color.textFaint,
-    paddingVertical: space.lg,
+    fontSize: 20,
+    lineHeight: 27,
+    color: color.textSoft,
+    textAlign: 'center',
+    maxWidth: 300,
   },
   loading: { paddingVertical: space.xl, alignItems: 'center' },
   button: {

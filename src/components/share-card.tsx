@@ -122,8 +122,8 @@ export function ShareDots({ total, done, accent }: { total: number; done: Set<nu
 export const shareStyles = StyleSheet.create({
   quote: {
     fontFamily: font.displayItalic,
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 24,
+    lineHeight: 32,
     color: color.text,
     textAlign: 'center',
   },

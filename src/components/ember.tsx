@@ -85,6 +85,43 @@ export function EmberLoader({ size = 44, tint }: { size?: number; tint?: string 
   );
 }
 
+/**
+ * Seven rays from a still center, one for each light: the ornament for quiet
+ * places, such as a list with nothing in it yet.
+ */
+export function SevenRays({ size = 56 }: { size?: number }) {
+  return (
+    <View style={{ width: size, height: size }} accessible={false}>
+      {SEVEN.map((light, index) => (
+        <View
+          key={index}
+          style={{
+            position: 'absolute',
+            left: size / 2 - 1,
+            top: 0,
+            width: 2,
+            height: size,
+            transform: [{ rotate: `${(index * 360) / 7}deg` }],
+          }}>
+          {/* Only the outer part of the upper half is drawn, so the rays leave the center open. */}
+          <View style={{ width: 2, height: size * 0.3, borderRadius: 1, backgroundColor: light, opacity: 0.85 }} />
+        </View>
+      ))}
+      <View
+        style={{
+          position: 'absolute',
+          left: size / 2 - 3,
+          top: size / 2 - 3,
+          width: 6,
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: afterglow.cream,
+        }}
+      />
+    </View>
+  );
+}
+
 /** Seven small lights in a row: the app's signature under a title. */
 export function SevenDots() {
   return (
