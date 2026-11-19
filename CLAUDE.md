@@ -57,6 +57,8 @@ src/lib/i18n/{es,en}.ts            both dictionaries
 src/data/categories.ts             the kinds of practice a challenge can be
 src/data/board-templates.ts        starting points for boards, chakras among them
 src/data/chakras.ts                the seven centers
+src/data/daily.ts                  each weekday's light, moon names, the words said when a day is done
+src/components/ember.tsx           the ring loader, the seven-dot signature, the bloom
 src/lib/invite.ts                  challenge invite links, kept across sign-in on the web
 src/theme/tokens.ts                color / font / space scales
 tests/backend/                     the rules, tested against the deployed sandbox
@@ -71,6 +73,8 @@ tests/e2e/web.mjs                  a browser walk through the web build
   until then. What people write is never translated. Code, comments and
   commits in English.
 - Styles come from `@/theme/tokens` — no loose hex values in components.
+- Waiting is shown with `EmberLoader` (via `Loading` and busy buttons), never
+  the system spinner. Motion respects the device's reduce-motion setting.
 - Fonts: Bricolage Grotesque for headings, Instrument Sans for body and UI,
   and Noto Serif Devanagari for seed syllables.
 - Text fields keep a local draft and commit on blur (`components/field.tsx`).

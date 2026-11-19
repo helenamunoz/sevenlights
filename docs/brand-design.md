@@ -58,4 +58,12 @@ The built-in chakra covers are decorative. A person’s photos take priority in 
 - **Breathing and check-in.** A translucent amber paper disc grows and settles behind a steady clock. Keep the timer controls separate. Pair the optional note with a clear share switch and a honey Done button for the breathing challenge.
 - **Explore and sharing.** Use a compact, two-column feed where it fits. Story cards use a 9:16 frame, the person’s own images and words where available, and a small Ember Ring lockup near the bottom.
 
+## Living details
+
+- **Waiting.** The seven lights of the ring brighten in turn, like a slow breath going round. It replaces every system spinner, including inside busy buttons.
+- **Signature.** Seven small dots in ring order sit under screen titles.
+- **Today’s light.** Each weekday carries one of the seven colors, a word and a line; home shows it with tonight’s moon phase.
+- **A day done.** The seven lights open outward once and a closing line appears, with its own words on days 1, 7, 21, 40 and the last day.
+- With reduced motion on, the ring is still and the bloom does not play.
+
 Production art is in [assets/brand](../assets/brand). Platform icons are in [assets/images](../assets/images). Use the current in-app components and shared tokens when translating a mockup to code.

@@ -3,6 +3,7 @@ import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { BoardCard } from '@/components/board-card';
 import { ChakraColumn } from '@/components/chakra-column';
+import { SevenDots } from '@/components/ember';
 import { Button, Empty, Label, Loading, Screen } from '@/components/ui';
 import { useMyBoards } from '@/lib/api/boards';
 import { t } from '@/lib/i18n';
@@ -25,6 +26,7 @@ export default function MyBoardsScreen() {
       <View style={styles.header}>
         <Text style={styles.eyebrow}>{t('boards.eyebrow')}</Text>
         <Text style={styles.title}>{t('boards.title')}</Text>
+        <SevenDots />
         <Text style={styles.subtitle}>{t('boards.subtitle')}</Text>
       </View>
 

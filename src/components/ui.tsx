@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -17,6 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { EmberLoader, SevenDots } from '@/components/ember';
 import { t } from '@/lib/i18n';
 import { alpha, color, font, radius, space } from '@/theme/tokens';
 
@@ -79,6 +79,7 @@ export function Title({ eyebrow, children }: { eyebrow?: string; children: strin
     <View style={styles.titleWrap}>
       {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
       <Text style={styles.title}>{children}</Text>
+      <SevenDots />
     </View>
   );
 }
@@ -103,7 +104,7 @@ export function Empty({ children }: { children: string }) {
 export function Loading() {
   return (
     <View style={styles.loading}>
-      <ActivityIndicator color={color.textFaint} />
+      <EmberLoader />
     </View>
   );
 }
@@ -146,7 +147,7 @@ export function Button({
         style,
       ]}>
       {busy ? (
-        <ActivityIndicator color={kind === 'primary' ? color.ink : color.textSoft} />
+        <EmberLoader size={20} tint={kind === 'primary' ? color.ink : color.textSoft} />
       ) : (
         <Text
           style={[

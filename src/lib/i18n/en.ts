@@ -142,6 +142,7 @@ export const en: Record<keyof typeof es, string> = {
   'challenge.days': '{n} days',
   'challenge.minutes': '{n} min',
   'challenge.members': '{n} people',
+  'challenge.member': '1 person',
   'challenge.suggested': '7Lights team',
   'challenge.byApp': 'By the 7Lights team',
   'challenge.day': 'Day {n}',
@@ -181,6 +182,8 @@ export const en: Record<keyof typeof es, string> = {
   'rule.strict': 'Unbroken',
   'rule.strictHint': 'Every day in a row. Miss a day and you start again from day 1.',
 
+  'today.label': 'Today’s light',
+  'day.continue': 'Continue',
   'day.tick': 'Done',
   'day.ticked': 'Day done.',
   'day.done': 'Done',

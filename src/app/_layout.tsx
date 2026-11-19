@@ -15,6 +15,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BrandLockup } from '@/components/brand';
+import { EmberLoader } from '@/components/ember';
 import { ReminderSync } from '@/components/reminder-sync';
 import { Button, ToastProvider } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/lib/auth';
@@ -87,7 +88,13 @@ function Routes() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inside]);
 
-  if (!ready || profileLoading) return <View style={styles.blank} />;
+  if (!ready || profileLoading) {
+    return (
+      <View style={styles.waiting}>
+        <EmberLoader size={56} />
+      </View>
+    );
+  }
 
   if (session && profileFailed) {
     return (
@@ -135,6 +142,7 @@ function Routes() {
 
 const styles = StyleSheet.create({
   blank: { flex: 1, backgroundColor: color.ink },
+  waiting: { flex: 1, backgroundColor: color.ink, alignItems: 'center', justifyContent: 'center' },
   notice: {
     flex: 1,
     backgroundColor: color.ink,

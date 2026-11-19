@@ -143,6 +143,7 @@ export const es = {
   'challenge.days': '{n} días',
   'challenge.minutes': '{n} min',
   'challenge.members': '{n} personas',
+  'challenge.member': '1 persona',
   'challenge.suggested': 'Equipo 7Lights',
   'challenge.byApp': 'Por el equipo 7Lights',
   'challenge.day': 'Día {n}',
@@ -182,6 +183,8 @@ export const es = {
   'rule.strict': 'Sin cortar',
   'rule.strictHint': 'Todos los días seguidos. Si un día no lo hacés, volvés a empezar desde el día 1.',
 
+  'today.label': 'La luz de hoy',
+  'day.continue': 'Seguir',
   'day.tick': 'Hecho',
   'day.ticked': 'Día hecho.',
   'day.done': 'Hecho',

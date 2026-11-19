@@ -5,6 +5,7 @@ import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { ChallengeCard } from '@/components/challenge-card';
 import { PathCard, pathsFrom } from '@/components/path-card';
 import { CategoryPicker } from '@/components/pickers';
+import { TodayCard } from '@/components/today-card';
 import { Button, Empty, Label, Loading, Screen, Segmented, Title } from '@/components/ui';
 import { categoryOf, type CategoryId } from '@/data/categories';
 import { LEVELS, levelOf } from '@/data/levels';
@@ -69,6 +70,7 @@ export default function ChallengesScreen() {
         <RefreshControl refreshing={community.isRefetching} onRefresh={refresh} tintColor={color.textFaint} />
       }>
       <Title eyebrow={t('challenges.eyebrow')}>{t('challenges.title')}</Title>
+      <TodayCard />
 
       {memberships.data?.length ? (
         <View style={styles.section}>

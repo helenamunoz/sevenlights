@@ -119,6 +119,7 @@ try {
     // Home is the challenges: the 7Lights team's, one per kind of practice.
     await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
     await page.getByText('Pick one to begin.').waitFor();
+    await page.getByText('Today’s light').waitFor();
     await page.locator('[aria-label="Stillness, 6 steps"]').waitFor({ timeout: 20_000 });
     await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
     await shot('05-home-challenges');
@@ -221,7 +222,10 @@ try {
     await shot('13-day-one');
     await page.getByText('Done', { exact: true }).last().click();
     await page.getByText('✓ Done').last().waitFor({ timeout: 20_000 });
+    await page.getByText('You began. The hardest part is behind you.').waitFor();
     await shot('14-day-ticked');
+    await page.getByText('Continue', { exact: true }).click();
+    await page.getByText('That’s it for today.').first().waitFor({ timeout: 20_000 });
     const checkins = await me.read('myCheckins');
     assert.equal(checkins.length, 1);
     assert.equal(checkins[0].day_number, 1);

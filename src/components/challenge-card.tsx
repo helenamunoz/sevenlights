@@ -21,7 +21,8 @@ export function challengeFacts(challenge: Challenge): string {
   if (challenge.timer_seconds) {
     parts.push(t('challenge.minutes', { n: Math.round(challenge.timer_seconds / 60) || 1 }));
   }
-  if (challenge.member_count > 0) parts.push(t('challenge.members', { n: challenge.member_count }));
+  if (challenge.member_count === 1) parts.push(t('challenge.member'));
+  else if (challenge.member_count > 1) parts.push(t('challenge.members', { n: challenge.member_count }));
   return parts.join(' · ');
 }
 
