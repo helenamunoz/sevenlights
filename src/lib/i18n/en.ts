@@ -24,7 +24,8 @@ export const en: Record<keyof typeof es, string> = {
   'tabs.challenges': 'Challenges',
   'tabs.profile': 'Profile',
 
-  'signIn.tagline': 'Raise our frequency together.',
+  'signIn.tagline': 'Raise our frequency, together.',
+  'signIn.descriptor': 'Daily spiritual practice, shared.',
   'signIn.email': 'Your email',
   'signIn.emailPlaceholder': 'you@example.com',
   'signIn.emailHint': 'We’ll send you a one-time code. No passwords.',
@@ -247,6 +248,18 @@ export const en: Record<keyof typeof es, string> = {
   'new.badTimer': 'The timer must be between 1 and 120 minutes.',
   'new.badLink': 'The link must start with https://',
   'new.tooMany': 'You’ve created several challenges today. Try tomorrow.',
+
+  'intention.label': 'Your intention',
+  'intention.placeholder': 'Why are you doing this? Only you can see it.',
+
+  'paths.title': 'Paths',
+  'paths.about': 'Challenges in an order that builds. Nothing is locked: start wherever you are.',
+  'path.steps': '{n} steps',
+  'path.progress': '{done} of {total} done',
+  'path.complete': 'Path complete',
+  'path.nextUp': 'Next: {title}',
+  'path.step': '{name} path · step {n} of {total}',
+  'path.next': 'Next on this path',
 
   'invite.button': 'Invite someone',
   'invite.hint': 'Send the link to anyone. Their day 1 is the day they join.',

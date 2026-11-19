@@ -84,7 +84,7 @@ try {
 
   await step('sign-in screen asks Cognito for a code', async () => {
     await page.goto(base);
-    await page.getByText('Raise our frequency together.').waitFor();
+    await page.getByText('Raise our frequency, together.').waitFor();
     await shot('01-sign-in');
     await page.getByPlaceholder('you@example.com').fill(email);
     await page.getByText('Send code').click();
@@ -119,6 +119,7 @@ try {
     // Home is the challenges: the 7Lights team's, one per kind of practice.
     await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
     await page.getByText('Pick one to begin.').waitFor();
+    await page.locator('[aria-label="Stillness, 6 steps"]').waitFor({ timeout: 20_000 });
     await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
     await shot('05-home-challenges');
     assert.equal((await me.read('boardsOf', { ownerId: me.id })).length, 0, 'no boards until you make one');
@@ -206,7 +207,14 @@ try {
     await page.locator('[aria-label="5 minutes of mindful breathing"]').first().click();
     await page.getByText('Join', { exact: true }).click();
     await page.getByText('Do day 1').waitFor({ timeout: 20_000 });
+    await page.getByText('Breath path · step 2 of 3').waitFor();
+    const intention = page.getByPlaceholder('Why are you doing this? Only you can see it.');
+    await intention.fill('To come back to myself');
+    await intention.blur();
+    await page.waitForTimeout(2000);
     await shot('12-challenge-joined');
+    const joined = (await me.read('myMemberships')).find((m) => m.challenge_id === 'official-breathing-en');
+    assert.equal(joined.intention, 'To come back to myself');
     await page.getByText('Do day 1').click();
     await page.getByPlaceholder('How did it go today?').waitFor({ timeout: 20_000 });
     await page.getByPlaceholder('How did it go today?').fill('Cinco minutos tranquilos.');

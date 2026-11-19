@@ -218,6 +218,8 @@ test('challenges: what a creator can and cannot set', async () => {
     missed_rule: 'calendar',
     days: [{ day_number: 1, body: 'hola' }],
     is_official: true,
+    path_id: 'stillness',
+    next_id: 'official-sky-en',
     rank: 1,
     up_count: 40,
     member_count: 900,
@@ -229,6 +231,8 @@ test('challenges: what a creator can and cannot set', async () => {
   assert.equal(created.is_official, false, 'self-official');
   assert.equal(created.category, 'other', 'no category given');
   assert.equal(created.level, 'beginning', 'no level given');
+  assert.equal(created.path_id ?? null, null, 'only team challenges sit on a path');
+  assert.equal(created.next_id ?? null, null);
   assert.equal(created.rank, 0, 'forged rank');
   assert.equal(created.up_count, 0);
   assert.equal(created.member_count, 1, 'the creator is its first member');
@@ -285,6 +289,15 @@ test('joining: day 1 is the day you join, and cannot be backdated', async () => 
   const memberships = await bea.read('myMemberships');
   assert.equal(memberships.length, 3);
   assert.equal(memberships.find((m) => m.challenge_id === state.calendar).start_date, utcDate(-1));
+
+  // An intention belongs to a membership: only a member can set one, and only on their own.
+  await bea.write('setIntention', { challengeId: state.calendar, intention: 'volver a mí' });
+  const mine = (await bea.read('myMemberships')).find((m) => m.challenge_id === state.calendar);
+  assert.equal(mine.intention, 'volver a mí');
+  const anas = (await ana.read('myMemberships')).find((m) => m.challenge_id === state.calendar);
+  assert.equal(anas.intention, '', 'someone else’s intention is not yours to read');
+  await refused(cam.write('setIntention', { challengeId: state.calendar, intention: 'x' }), 'not_a_member');
+  await refused(bea.write('setIntention', { challengeId: state.calendar, intention: 'x'.repeat(201) }), 'bad_intention');
 });
 
 test('check-ins: day bounds for each missed-day rule', async () => {
@@ -484,11 +497,21 @@ test('seed: the 7Lights team challenges, in order, safe to repeat', async () => 
     const newer = [
       ...['habits', 'breath', 'movement', 'writing', 'habits', 'meditation'],
       ...['contemplation', 'mantra', 'breath', 'meditation', 'contemplation', 'meditation', 'meditation'],
+      ...['meditation', 'rest', 'writing'],
     ];
     if (locale === 'en') {
       const count = (level) => suggested.filter((c) => c.level === level).length;
-      assert.deepEqual([count('beginning'), count('deepening'), count('committed')], [11, 6, 2]);
-      assert.equal(suggested.at(-1).missed_rule, 'strict', 'forty days, unbroken');
+      assert.deepEqual([count('beginning'), count('deepening'), count('committed')], [14, 6, 2]);
+      const byId = new Map(suggested.map((c) => [c.id, c]));
+      assert.equal(byId.get('official-forty-days-en').missed_rule, 'strict', 'forty days, unbroken');
+      // Paths: every step numbered in order, each pointing at the one after it.
+      const stillness = suggested.filter((c) => c.path_id === 'stillness').sort((a, b) => a.path_step - b.path_step);
+      assert.deepEqual(stillness.map((c) => c.path_step), [1, 2, 3, 4, 5, 6]);
+      assert.ok(stillness.every((c) => c.path_total === 6 && c.path_name === 'Stillness'));
+      assert.deepEqual(stillness.map((c) => c.next_id), [...stillness.slice(1).map((c) => c.id), null]);
+      assert.equal(byId.get('official-seven-centers-en').path_id, null, 'not every challenge is on a path');
+    } else {
+      assert.ok(suggested.every((c) => c.path_id === null), 'no path where a step is not written yet');
     }
     assert.ok(suggested.every((c) => c.is_official && c.creator_id === null));
     assert.deepEqual(suggested.map((c) => c.category), locale === 'en' ? [...first, ...newer] : first);

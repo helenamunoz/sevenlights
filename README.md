@@ -7,7 +7,9 @@ A free app to raise your frequency through daily practice done in company:
   movement, writing, rest, habits, chakras or anything else. Day 1 is the day
   you join. Each day you tick it done and can leave a note. Comments and
   votes; the best-voted ones rise. Each has a level (beginning, deepening
-  or committed), so there is a way in for anyone and somewhere to go next. Every challenge has an invite link that
+  or committed), so there is a way in for anyone and somewhere to go next.
+  The team's challenges are strung into paths that say what comes after the
+  one you finished, and each one you join can hold a private intention. Every challenge has an invite link that
   opens it on the web, also for someone who has yet to sign up. A starter series, one per kind of
   practice, is signed by the 7Lights team.
 - **Vision boards** are a second, optional tool. Start one from a blank page

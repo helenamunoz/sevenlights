@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { ChallengeCard } from '@/components/challenge-card';
+import { PathCard, pathsFrom } from '@/components/path-card';
 import { CategoryPicker } from '@/components/pickers';
 import { Button, Empty, Label, Loading, Screen, Segmented, Title } from '@/components/ui';
 import { categoryOf, type CategoryId } from '@/data/categories';
@@ -40,6 +41,21 @@ export default function ChallengesScreen() {
   );
   const others = (community.data ?? []).filter((c) => !joined.has(c.id));
 
+  const paths = pathsFrom(team.data ?? []);
+  const completed = new Set(
+    (memberships.data ?? [])
+      .filter(
+        (m) =>
+          progress(
+            m.challenge.missed_rule,
+            m.challenge.duration_days,
+            m.start_date,
+            (checkins.data ?? []).filter((c) => c.challenge_id === m.challenge_id)
+          )?.status === 'completed'
+      )
+      .map((m) => m.challenge_id)
+  );
+
   function refresh() {
     memberships.refetch();
     checkins.refetch();
@@ -75,6 +91,16 @@ export default function ChallengesScreen() {
       ) : null}
 
       <CategoryPicker value={category} onChange={setCategory} allLabel={t('challenges.all')} />
+
+      {category === null && paths.length ? (
+        <View style={styles.section}>
+          <Label>{t('paths.title')}</Label>
+          <Text style={styles.levelAbout}>{t('paths.about')}</Text>
+          {paths.map((path) => (
+            <PathCard key={path.id} path={path} completed={completed} />
+          ))}
+        </View>
+      ) : null}
 
       {fromTeam.length ? (
         <View style={styles.section}>

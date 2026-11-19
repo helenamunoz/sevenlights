@@ -499,7 +499,115 @@ const TEAM: TeamChallenge[] = [
       ],
     },
   },
+  {
+    slug: 'one-song',
+    order: 20,
+    category: 'meditation',
+    duration_days: 7,
+    timer_seconds: null,
+    light: 'vishuddha',
+    en: {
+      title: 'One song, eyes closed',
+      description:
+        'Once a day, listen to one piece of music from beginning to end with your eyes closed, doing nothing else. No scrolling, no chores, no skipping ahead. A way into stillness for people who find silence hard.',
+      days: [
+        [1, 'Pick a song you know well. Hear it as if for the first time.'],
+        [3, 'Follow one instrument or one voice all the way through.'],
+        [5, 'Choose something without words today.'],
+        [7, 'Last day. When the song ends, stay for a minute in the quiet after it.'],
+      ],
+    },
+  },
+  {
+    slug: 'rest-eyes',
+    order: 21,
+    category: 'rest',
+    duration_days: 14,
+    timer_seconds: 300,
+    light: 'ajna',
+    en: {
+      title: 'Five minutes lying down, eyes closed',
+      description:
+        'Somewhere in the middle of your day, lie down for five minutes and close your eyes. Not to sleep, not to think anything through: only to stop. Put the phone out of reach and let the timer bring you back.',
+      days: [
+        [1, 'Find your place: a bed, a sofa, a mat on the floor.'],
+        [4, 'Let your jaw, your shoulders and your hands go heavy, in that order.'],
+        [8, 'Notice the sounds around you without naming them.'],
+        [11, 'Before you get up, take three slow breaths.'],
+        [14, 'Last day. Notice what time of day you needed this most.'],
+      ],
+    },
+  },
+  {
+    slug: 'one-thing-well',
+    order: 22,
+    category: 'writing',
+    duration_days: 14,
+    timer_seconds: null,
+    light: 'manipura',
+    en: {
+      title: 'One thing I did well today',
+      description:
+        'Each night, write one line in the day’s note: something you did well today. Small counts. Showing up counts. The practice is learning to see it.',
+      days: [
+        [1, 'Start small. One true line.'],
+        [4, 'Today, something you did well for someone else.'],
+        [8, 'Something you did well that nobody noticed.'],
+        [11, 'Something you did well on a day that went badly.'],
+        [14, 'Last day. Read your lines back, slowly.'],
+      ],
+    },
+  },
 ];
+
+/**
+ * Paths: team challenges in an order that makes sense to do them in. Nothing
+ * is locked: a path only tells the person where they are and what comes next.
+ * A path exists in a language only when every step does.
+ */
+const PATHS: { id: string; name: Record<'es' | 'en', string>; steps: string[] }[] = [
+  {
+    id: 'breath',
+    name: { es: 'Respiración', en: 'Breath' },
+    steps: ['box-breathing', 'breathing', 'alternate-nostril'],
+  },
+  {
+    id: 'stillness',
+    name: { es: 'Quietud', en: 'Stillness' },
+    steps: ['one-song', 'sky', 'stillness', 'twenty-stillness', 'hour-of-silence', 'forty-days'],
+  },
+  {
+    id: 'looking-inward',
+    name: { es: 'Mirar hacia adentro', en: 'Looking inward' },
+    steps: ['loving-kindness', 'mantra', 'self-inquiry'],
+  },
+  {
+    id: 'the-page',
+    name: { es: 'La página', en: 'The page' },
+    steps: ['one-thing-well', 'three-lines', 'morning-pages'],
+  },
+  {
+    id: 'unplugged',
+    name: { es: 'Sin pantallas', en: 'Unplugged' },
+    steps: ['screens-off', 'phone-free-morning', 'rest-eyes', 'walk'],
+  },
+];
+
+/** Where a team challenge sits on its path, as stored on its row; all null when it is on none. */
+function pathFields(slug: string, locale: 'es' | 'en'): Item {
+  const written = (step: string) => Boolean(TEAM.find((entry) => entry.slug === step)?.[locale]);
+  const path = PATHS.find((candidate) => candidate.steps.includes(slug) && candidate.steps.every(written));
+  if (!path) return { path_id: null, path_name: null, path_step: null, path_total: null, next_id: null };
+  const index = path.steps.indexOf(slug);
+  const next = path.steps[index + 1];
+  return {
+    path_id: path.id,
+    path_name: path.name[locale],
+    path_step: index + 1,
+    path_total: path.steps.length,
+    next_id: next ? `official-${next}-${locale}` : null,
+  };
+}
 
 export async function seed(): Promise<{ created: number; challenges: number }> {
   let created = 0;
@@ -550,6 +658,8 @@ export async function seed(): Promise<{ created: number; challenges: number }> {
           });
         }
       }
+      // Paths can be rearranged between runs; where a challenge sits is the team's to say.
+      await update(challenge.pk, 'A', { set: pathFields(entry.slug, locale) });
       await batchWrite([
         { pk: `CHLO#${locale}`, sk: id },
         ...copy.days.map(([day, body]) => ({

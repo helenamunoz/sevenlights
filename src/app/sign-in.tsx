@@ -36,6 +36,7 @@ export default function SignInScreen() {
         <View style={styles.hero}>
           <BrandLockup />
           <Text style={styles.tagline}>{t('signIn.tagline')}</Text>
+          <Text style={styles.descriptor}>{t('signIn.descriptor')}</Text>
         </View>
         <CoverArt source={artwork.dusk} style={styles.cover} />
         <View style={styles.form}>
@@ -109,6 +110,14 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', marginTop: space.xl, marginBottom: space.lg },
   cover: { width: '100%', height: 205 },
   form: { marginTop: space.lg, gap: space.sm },
+  descriptor: {
+    fontFamily: font.body,
+    fontSize: 15,
+    lineHeight: 22,
+    color: color.textSoft,
+    textAlign: 'center',
+    marginTop: space.xs,
+  },
   tagline: {
     fontFamily: font.displayMedium,
     fontSize: 24,

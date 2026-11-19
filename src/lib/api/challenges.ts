@@ -163,6 +163,15 @@ export function useRestart() {
   });
 }
 
+export function useSetIntention() {
+  const me = useMe();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { challengeId: string; intention: string }) => write('setIntention', input),
+    onSettled: () => client.invalidateQueries({ queryKey: ['memberships', me] }),
+  });
+}
+
 export function useSetReminder() {
   const me = useMe();
   const client = useQueryClient();

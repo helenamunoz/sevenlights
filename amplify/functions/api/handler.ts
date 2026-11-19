@@ -865,6 +865,7 @@ const writes: Record<string, Op> = {
       challenge_id: challengeId,
       user_id: caller.me,
       start_date: startDate,
+      intention: '',
       reminder_time: null,
       restarts: 0,
       joined_at: stamp,
@@ -915,7 +916,7 @@ const writes: Record<string, Op> = {
     return null;
   },
 
-  join: async ({ challengeId, start_date }, caller) => {
+  join: async ({ challengeId, start_date, intention }, caller) => {
     const challenge = await visibleChallenge(challengeId, caller);
     const startDate = localDate(start_date, 'bad_start_date');
     await transact([
@@ -926,6 +927,7 @@ const writes: Record<string, Op> = {
           challenge_id: challenge.id,
           user_id: caller.me,
           start_date: startDate,
+          intention: text(intention ?? '', 200, 0, 'bad_intention'),
           reminder_time: null,
           restarts: 0,
           joined_at: now(),
@@ -958,6 +960,15 @@ const writes: Record<string, Op> = {
     });
     if (!done) refuse('not_a_member');
     await clearCheckins(challengeId, caller.me);
+    return null;
+  },
+
+  /** Why the member is doing this challenge. Theirs alone: it is never shown to anyone else. */
+  setIntention: async ({ challengeId, intention }, caller) => {
+    const done = await update(`U#${caller.me}`, `MEM#${validId(challengeId)}`, {
+      set: { intention: text(intention, 200, 0, 'bad_intention') },
+    });
+    if (!done) refuse('not_a_member');
     return null;
   },
 

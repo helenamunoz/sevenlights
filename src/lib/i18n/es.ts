@@ -26,6 +26,7 @@ export const es = {
   'tabs.profile': 'Perfil',
 
   'signIn.tagline': 'Elevemos nuestra frecuencia, en compañía.',
+  'signIn.descriptor': 'Práctica espiritual diaria, compartida.',
   'signIn.email': 'Tu email',
   'signIn.emailPlaceholder': 'vos@ejemplo.com',
   'signIn.emailHint': 'Te mandamos un código de un solo uso. Sin contraseñas.',
@@ -248,6 +249,18 @@ export const es = {
   'new.badTimer': 'El temporizador va de 1 a 120 minutos.',
   'new.badLink': 'El enlace tiene que empezar con https://',
   'new.tooMany': 'Ya creaste varios desafíos hoy. Probá mañana.',
+
+  'intention.label': 'Tu intención',
+  'intention.placeholder': '¿Para qué lo hacés? Solo vos la ves.',
+
+  'paths.title': 'Caminos',
+  'paths.about': 'Desafíos en un orden que suma. Nada está bloqueado: empezá donde estés.',
+  'path.steps': '{n} pasos',
+  'path.progress': '{done} de {total} hechos',
+  'path.complete': 'Camino completo',
+  'path.nextUp': 'Sigue: {title}',
+  'path.step': 'Camino {name} · paso {n} de {total}',
+  'path.next': 'Siguiente en este camino',
 
   'invite.button': 'Invitar a alguien',
   'invite.hint': 'Mandale el enlace a quien quieras. Su día 1 es el día en que se suma.',

@@ -78,6 +78,12 @@ export type Challenge = {
   comment_count: number;
   hidden_at: string | null;
   created_at: string;
+  /** Team challenges on a path say which, where on it they sit, and what follows. */
+  path_id?: string | null;
+  path_name?: string | null;
+  path_step?: number | null;
+  path_total?: number | null;
+  next_id?: string | null;
   creator?: Author | null;
 };
 
@@ -94,6 +100,8 @@ export type Membership = {
   challenge_id: string;
   user_id: string;
   start_date: string;
+  /** Why they are doing it, in their words. Only ever returned to its owner. */
+  intention?: string;
   reminder_time: string | null;
   restarts: number;
   joined_at: string;

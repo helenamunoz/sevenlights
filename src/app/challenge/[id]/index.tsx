@@ -6,6 +6,7 @@ import { CoverArt } from '@/components/brand';
 import { Byline } from '@/components/avatar';
 import { challengeFacts } from '@/components/challenge-card';
 import { CommentList, Entry, shortDate } from '@/components/comment-list';
+import { Field } from '@/components/field';
 import { ReportMenu } from '@/components/report-menu';
 import { ShareCard, ShareDots, ShareModal, shareStyles } from '@/components/share-card';
 import { ActionSheet, Sheet, SheetRow, type Action } from '@/components/sheet';
@@ -19,6 +20,7 @@ import {
   useLeave,
   useMyProgress,
   useRestart,
+  useSetIntention,
   useSetReminder,
   useSharedNotes,
 } from '@/lib/api/challenges';
@@ -77,6 +79,7 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
   const restart = useRestart();
   const remove = useDeleteChallenge();
   const setReminder = useSetReminder();
+  const setIntention = useSetIntention();
 
   const [sharing, setSharing] = useState(false);
   const [choosingTime, setChoosingTime] = useState(false);
@@ -123,6 +126,11 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
 
       <Text style={styles.facts}>{challengeFacts(challenge)}</Text>
       <Text style={styles.title}>{challenge.title}</Text>
+      {challenge.path_id ? (
+        <Text style={styles.path}>
+          {t('path.step', { name: challenge.path_name ?? '', n: challenge.path_step ?? 1, total: challenge.path_total ?? 1 })}
+        </Text>
+      ) : null}
       {challenge.is_official ? (
         <Text style={styles.official}>{t('challenge.byApp')}</Text>
       ) : (
@@ -150,6 +158,15 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
         </View>
       ) : (
         <View style={styles.block}>
+          <Field
+            label={t('intention.label')}
+            value={membership.intention ?? ''}
+            placeholder={t('intention.placeholder')}
+            accent={accent}
+            italic
+            maxLength={200}
+            onChange={(intention) => setIntention.mutate({ challengeId: challenge.id, intention }, failed)}
+          />
           <Text style={styles.status}>{statusLine(challenge, progress)}</Text>
           <View
             style={styles.track}
@@ -168,6 +185,14 @@ function ChallengeView({ challenge }: { challenge: Challenge }) {
             accent={accent}
             onOpen={(day) => router.push(`/challenge/${challenge.id}/day/${day}`)}
           />
+          {progress.status === 'completed' && challenge.next_id ? (
+            <Button
+              label={t('path.next')}
+              accent={accent}
+              onPress={() => router.push(`/challenge/${challenge.next_id}`)}
+              style={styles.next}
+            />
+          ) : null}
           {today ? (
             <Button
               label={t('challenge.doDay', { n: today })}
@@ -371,6 +396,8 @@ const styles = StyleSheet.create({
     marginTop: space.md,
   },
   title: { fontFamily: font.display, fontSize: 36, lineHeight: 41, color: color.text, marginTop: space.sm },
+  path: { fontFamily: font.bodyMedium, fontSize: 13, color: color.textSoft, marginTop: space.xs },
+  next: { marginBottom: space.sm },
   inviteHint: { fontFamily: font.body, fontSize: 13, lineHeight: 19, color: color.textFaint, marginTop: space.sm },
   official: {
     fontFamily: font.bodyBold,

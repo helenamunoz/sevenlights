@@ -5,8 +5,10 @@ practices of any kind (breath, meditation, contemplation, mantra, movement,
 writing, rest, habits, chakras…) that anyone can create and join. The app is
 non-denominational and built as a ladder: every challenge has a level
 (beginning, deepening, committed; `src/data/levels.ts`), and the 7Lights
-team's series runs from a few minutes a day to forty days unbroken. Every
-challenge has an invite link. **Vision boards** are a
+team's series runs from a few minutes a day to forty days unbroken. Team
+challenges are also strung into **paths** (`PATHS` in the seed): an order to
+do them in, never a lock. Joining a challenge comes with a private
+**intention**. Every challenge has an invite link. **Vision boards** are a
 second, optional tool: nobody starts with any, and a new one comes from a
 blank page or a template (a year, life areas, a project, gratitude, the seven
 chakras). Chakras are one category and one template among the others, not the
