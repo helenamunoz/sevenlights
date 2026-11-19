@@ -59,6 +59,8 @@ src/data/board-templates.ts        starting points for boards, chakras among the
 src/data/chakras.ts                the seven centers
 src/data/daily.ts                  each weekday's light, moon names, the words said when a day is done
 src/components/ember.tsx           the ring loader, the seven-dot signature, the bloom
+src/components/day-timer.tsx       the countdown: threshold ("Arrive."), bowl at start and end
+assets/sounds/bowl.mp3             synthesized for 7Lights, not a recording
 src/lib/invite.ts                  challenge invite links, kept across sign-in on the web
 src/theme/tokens.ts                color / font / space scales
 tests/backend/                     the rules, tested against the deployed sandbox
@@ -67,6 +69,12 @@ tests/e2e/web.mjs                  a browser walk through the web build
 
 ## Conventions
 
+- **People see "practices", the code says "challenge".** The interface words
+  are Practices, Begin and Complete; identifiers, operations and the table keep
+  `challenge`. Do not rename the code to match.
+- **Tabs:** Today (quiet: the day's light, what is in progress, one
+  suggestion), Practices (paths, the team's ladder, community, create),
+  Boards (with other people's boards a tap away), Profile.
 - **English-only for now** (`LANGUAGES` in `src/lib/i18n/index.ts`). The Spanish
   dictionary (rioplatense voseo: "guardá", "sumá", "podés") is kept complete so
   it can be switched back on; new team challenges are written in English only

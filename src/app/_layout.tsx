@@ -127,6 +127,7 @@ function Routes() {
         </Stack.Protected>
         <Stack.Protected guard={onboarded}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="explore" />
           <Stack.Screen name="board/new" />
           <Stack.Screen name="board/[id]" />
           <Stack.Screen name="user/[username]" />

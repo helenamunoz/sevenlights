@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { RefreshControl, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { BoardCard } from '@/components/board-card';
-import { Button, Empty, Loading, Screen, Segmented, Title } from '@/components/ui';
+import { BackBar, Button, Empty, Loading, Screen, Segmented, Title } from '@/components/ui';
 import { useExplore, type ExploreSort } from '@/lib/api/boards';
 import { t } from '@/lib/i18n';
 import { color, space } from '@/theme/tokens';
@@ -17,6 +17,7 @@ export default function ExploreScreen() {
 
   return (
     <Screen
+      header={<BackBar />}
       refreshControl={
         <RefreshControl
           refreshing={explore.isRefetching && !explore.isFetchingNextPage}

@@ -1,77 +1,82 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { ChallengeCard } from '@/components/challenge-card';
-import { PathCard, pathsFrom } from '@/components/path-card';
-import { CategoryPicker } from '@/components/pickers';
 import { TodayCard } from '@/components/today-card';
-import { Button, Empty, Label, Loading, Screen, Segmented, Title } from '@/components/ui';
-import { categoryOf, type CategoryId } from '@/data/categories';
+import { Button, Label, Loading, Screen, Title } from '@/components/ui';
 import { DAY_LIGHTS } from '@/data/daily';
-import { LEVELS, levelOf } from '@/data/levels';
-import {
-  useChallenges,
-  useMemberships,
-  useMyCheckins,
-  useSuggestedChallenges,
-  type ChallengeSort,
-} from '@/lib/api/challenges';
+import { levelOf } from '@/data/levels';
+import { useMemberships, useMyCheckins, useSuggestedChallenges, type Joined } from '@/lib/api/challenges';
 import { progress } from '@/lib/days';
-import { LANGUAGES, locale, t, tr, type Locale } from '@/lib/i18n';
+import type { Challenge, Checkin } from '@/lib/db.types';
+import { t, type TextKey } from '@/lib/i18n';
 import { alpha, color, font, space } from '@/theme/tokens';
 
-/**
- * Home. The challenges you are doing, then what to join next: the 7Lights
- * team's as a ladder from beginning to committed, and the community's, of
- * every kind of practice or just one.
- */
-export default function ChallengesScreen() {
-  const router = useRouter();
-  const [category, setCategory] = useState<CategoryId | null>(null);
-  const [sort, setSort] = useState<ChallengeSort>('top');
-  const [language, setLanguage] = useState<Locale | 'all'>(locale);
+/** How the day is greeted, by the hour on the person's own clock. */
+function greeting(hour = new Date().getHours()): TextKey {
+  if (hour < 5) return 'today.night';
+  if (hour < 8) return 'today.firstLight';
+  if (hour < 12) return 'today.morning';
+  if (hour < 17) return 'today.afternoon';
+  if (hour < 20) return 'today.goldenHour';
+  if (hour < 23) return 'today.evening';
+  return 'today.night';
+}
 
+const standing = (membership: Joined, checkins: Checkin[]) =>
+  progress(
+    membership.challenge.missed_rule,
+    membership.challenge.duration_days,
+    membership.start_date,
+    checkins.filter((c) => c.challenge_id === membership.challenge_id)
+  );
+
+/**
+ * One practice to offer: the next step of a path the person has finished a
+ * step of, or else one of the team's beginning practices, a different one
+ * each day.
+ */
+function suggestion(team: Challenge[], joined: Set<string>, completed: Set<string>): Challenge | null {
+  const open = team.filter((challenge) => !joined.has(challenge.id));
+  const onward = team.find((challenge) => completed.has(challenge.id) && challenge.next_id && !joined.has(challenge.next_id));
+  const next = onward && open.find((challenge) => challenge.id === onward.next_id);
+  if (next) return next;
+  const gentle = open.filter((challenge) => levelOf(challenge).id === 'beginning');
+  const pool = gentle.length ? gentle : open;
+  const dayNumber = Math.floor(Date.now() / 86_400_000);
+  return pool.length ? pool[dayNumber % pool.length] : null;
+}
+
+/**
+ * Home, kept quiet: today's light, what you are in the middle of, and one
+ * thing you might begin. Everything else is a tap away on Practices.
+ */
+export default function TodayScreen() {
+  const router = useRouter();
   const memberships = useMemberships();
   const checkins = useMyCheckins();
   const team = useSuggestedChallenges();
-  const community = useChallenges(sort, language, category);
 
-  const joined = new Set((memberships.data ?? []).map((m) => m.challenge_id));
-  const fromTeam = (team.data ?? []).filter(
-    (c) => !joined.has(c.id) && (category === null || categoryOf(c).id === category)
-  );
-  const others = (community.data ?? []).filter((c) => !joined.has(c.id));
+  const mine = memberships.data ?? [];
+  const ticks = checkins.data ?? [];
+  const joined = new Set(mine.map((m) => m.challenge_id));
+  const completed = new Set(mine.filter((m) => standing(m, ticks)?.status === 'completed').map((m) => m.challenge_id));
+  const offered = team.data ? suggestion(team.data, joined, completed) : null;
 
   const today = DAY_LIGHTS[new Date().getDay()];
   const sky = today.glow ?? today.color;
-  const paths = pathsFrom(team.data ?? []);
-  const completed = new Set(
-    (memberships.data ?? [])
-      .filter(
-        (m) =>
-          progress(
-            m.challenge.missed_rule,
-            m.challenge.duration_days,
-            m.start_date,
-            (checkins.data ?? []).filter((c) => c.challenge_id === m.challenge_id)
-          )?.status === 'completed'
-      )
-      .map((m) => m.challenge_id)
-  );
 
   function refresh() {
     memberships.refetch();
     checkins.refetch();
     team.refetch();
-    community.refetch();
   }
 
   return (
     <Screen
       refreshControl={
-        <RefreshControl refreshing={community.isRefetching} onRefresh={refresh} tintColor={color.textFaint} />
+        <RefreshControl refreshing={memberships.isRefetching} onRefresh={refresh} tintColor={color.textFaint} />
       }>
       <LinearGradient
         pointerEvents="none"
@@ -79,22 +84,19 @@ export default function ChallengesScreen() {
         locations={[0, 0.3, 0.7, 1]}
         style={styles.sky}
       />
-      <Title eyebrow={t('challenges.eyebrow')}>{t('challenges.title')}</Title>
+      <Title eyebrow={t(greeting())}>{t('today.title')}</Title>
       <TodayCard />
 
-      {memberships.data?.length ? (
+      {memberships.isPending ? <Loading /> : null}
+
+      {mine.length ? (
         <View style={styles.section}>
           <Label>{t('challenges.mine')}</Label>
-          {memberships.data.map((membership) => (
+          {mine.map((membership) => (
             <ChallengeCard
               key={membership.challenge_id}
               challenge={membership.challenge}
-              progress={progress(
-                membership.challenge.missed_rule,
-                membership.challenge.duration_days,
-                membership.start_date,
-                (checkins.data ?? []).filter((c) => c.challenge_id === membership.challenge_id)
-              )}
+              progress={standing(membership, ticks)}
             />
           ))}
         </View>
@@ -102,68 +104,14 @@ export default function ChallengesScreen() {
         <Text style={styles.start}>{t('challenges.start')}</Text>
       ) : null}
 
-      <CategoryPicker value={category} onChange={setCategory} allLabel={t('challenges.all')} />
-
-      {category === null && paths.length ? (
+      {offered ? (
         <View style={styles.section}>
-          <Label>{t('paths.title')}</Label>
-          <Text style={styles.levelAbout}>{t('paths.about')}</Text>
-          {paths.map((path) => (
-            <PathCard key={path.id} path={path} completed={completed} />
-          ))}
+          <Label>{t('today.suggested')}</Label>
+          <ChallengeCard challenge={offered} />
         </View>
       ) : null}
 
-      {fromTeam.length ? (
-        <View style={styles.section}>
-          <Label>{t('challenges.suggested')}</Label>
-          {LEVELS.map((level) => {
-            const rung = fromTeam.filter((challenge) => levelOf(challenge).id === level.id);
-            if (rung.length === 0) return null;
-            return (
-              <View key={level.id}>
-                <Text style={styles.level}>{tr(level.name)}</Text>
-                <Text style={styles.levelAbout}>{tr(level.about)}</Text>
-                {rung.map((challenge) => (
-                  <ChallengeCard key={challenge.id} challenge={challenge} />
-                ))}
-              </View>
-            );
-          })}
-        </View>
-      ) : null}
-
-      <View style={styles.section}>
-        <Label>{t('challenges.community')}</Label>
-        <View style={styles.filters}>
-          <Segmented
-            value={sort}
-            onChange={setSort}
-            options={[
-              { value: 'top', label: t('challenges.top') },
-              { value: 'new', label: t('challenges.new') },
-            ]}
-          />
-          {LANGUAGES.length > 1 ? (
-            <Segmented
-              value={language}
-              onChange={setLanguage}
-              options={[
-                { value: locale, label: t('challenges.myLanguage') },
-                { value: 'all', label: t('challenges.allLanguages') },
-              ]}
-            />
-          ) : null}
-        </View>
-        {community.isPending ? <Loading /> : null}
-        {community.isError && !community.data ? <Empty>{t('common.loadFailed')}</Empty> : null}
-        {community.isSuccess && others.length === 0 ? <Empty>{t('challenges.empty')}</Empty> : null}
-        {others.map((challenge) => (
-          <ChallengeCard key={challenge.id} challenge={challenge} />
-        ))}
-      </View>
-
-      <Button label={t('challenges.create')} onPress={() => router.push('/challenge/new')} />
+      <Button label={t('today.all')} kind="secondary" onPress={() => router.push('/practices')} />
     </Screen>
   );
 }
@@ -172,20 +120,10 @@ const styles = StyleSheet.create({
   section: { marginBottom: space.lg },
   // Behind the header, edge to edge. It fades in as well as out, so it has no top edge.
   sky: { position: 'absolute', top: 0, left: -space.lg, right: -space.lg, height: 460 },
-  filters: { gap: space.sm, marginBottom: space.md },
-  level: { fontFamily: font.display, fontSize: 24, lineHeight: 30, color: color.text, marginTop: space.sm },
-  levelAbout: {
-    fontFamily: font.body,
-    fontSize: 14,
-    lineHeight: 21,
-    color: color.textSoft,
-    marginTop: space.xs,
-    marginBottom: space.md,
-  },
   start: {
-    fontFamily: font.body,
-    fontSize: 15,
-    lineHeight: 23,
+    fontFamily: font.displayItalic,
+    fontSize: 20,
+    lineHeight: 27,
     color: color.textSoft,
     marginBottom: space.lg,
   },

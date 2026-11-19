@@ -54,6 +54,7 @@ export default function MyBoardsScreen() {
           kind={all.length === 0 ? 'primary' : 'secondary'}
           onPress={() => router.push('/board/new')}
         />
+        <Button label={t('boards.explore')} kind="quiet" onPress={() => router.push('/explore')} />
       </View>
     </Screen>
   );

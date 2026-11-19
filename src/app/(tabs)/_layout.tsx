@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '@/lib/i18n';
 import { afterglow, color, font } from '@/theme/tokens';
 
-/** The four places: challenges first, then your boards, other people's, and you. */
+/** The four places: today, every practice there is, your boards, and you. */
 export default function TabsLayout() {
   const { bottom } = useSafeAreaInsets();
 
@@ -23,15 +23,15 @@ export default function TabsLayout() {
       }}>
       <Tabs.Screen
         name="index"
+        options={{ title: t('tabs.today'), tabBarIcon: icon({ ios: 'sun.max', android: 'wb_sunny', web: 'wb_sunny' }) }}
+      />
+      <Tabs.Screen
+        name="practices"
         options={{ title: t('tabs.challenges'), tabBarIcon: icon({ ios: 'checkmark.square', android: 'check_box', web: 'check_box' }) }}
       />
       <Tabs.Screen
         name="boards"
         options={{ title: t('tabs.boards'), tabBarIcon: icon({ ios: 'square.stack', android: 'layers', web: 'layers' }) }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{ title: t('tabs.explore'), tabBarIcon: icon({ ios: 'safari', android: 'explore', web: 'explore' }) }}
       />
       <Tabs.Screen
         name="profile"

@@ -10,6 +10,7 @@ import { alpha, color, font, radius, space } from '@/theme/tokens';
 /** Today's light and tonight's moon: the one part of home that is different every day. */
 export function TodayCard() {
   const light = DAY_LIGHTS[new Date().getDay()];
+  const phase = moonPhase();
 
   return (
     <View style={[styles.card, { borderColor: alpha(light.color, 0.3) }]}>
@@ -22,7 +23,9 @@ export function TodayCard() {
         <Text style={styles.line}>{tr(light.line)}</Text>
         <View style={styles.moon}>
           <Moon size={14} />
-          <Text style={styles.moonName}>{tr(MOON_NAMES[moonPhase()])}</Text>
+          <Text style={styles.moonName}>
+            {phase === 'new' ? t('today.newMoon') : phase === 'full' ? t('today.fullMoon') : tr(MOON_NAMES[phase])}
+          </Text>
         </View>
       </View>
     </View>
@@ -53,5 +56,5 @@ const styles = StyleSheet.create({
   word: { fontFamily: font.display, fontSize: 24, lineHeight: 29 },
   line: { fontFamily: font.displayItalic, fontSize: 18, lineHeight: 25, color: color.textSoft },
   moon: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.xs },
-  moonName: { fontFamily: font.bodyMedium, fontSize: 12, color: color.textFaint },
+  moonName: { flex: 1, fontFamily: font.bodyMedium, fontSize: 12, lineHeight: 17, color: color.textFaint },
 });

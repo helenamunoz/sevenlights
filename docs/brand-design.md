@@ -6,7 +6,7 @@
 
 Write the product name **7Lights**. Use a numeral, a capital L, and no space. The board library is titled **Boards** in English and **Tableros** in Spanish.
 
-Write plain, specific actions, such as **Add image**, **Do day 8**, and **Done**. English is the reference language for these designs. The app also supports Rioplatense Spanish and follows the device locale. Preserve a person’s own words in either language.
+Write plain, specific actions, such as **Add image**, **Do day 8**, and **Complete**. What people join are **practices**, and they **Begin** them; avoid “challenge” in anything a person reads. English is the reference language for these designs. The app also supports Rioplatense Spanish and follows the device locale. Preserve a person’s own words in either language.
 
 ## Ember Ring
 
@@ -66,6 +66,8 @@ The built-in chakra covers are decorative. A person’s photos take priority in 
 - **A day done.** The seven lights open outward once and a closing line appears, with its own words on days 1, 7, 21, 40 and the last day.
 - **Home sky.** A soft wash of today’s color sits behind the home header and fades out on every side.
 - **Quiet places.** An empty list shows seven rays around a still center above its line of text.
+- **Threshold.** Starting a timed practice first shows an empty page that says “Arrive.” for a few seconds. A bowl sounds as the practice begins and as it ends.
+- **The hour.** Home greets by the time of day (First light, Golden hour, The quiet hours) and the moon has its own line on new and full nights.
 - With reduced motion on, the ring is still and the bloom does not play.
 
 Production art is in [assets/brand](../assets/brand). Platform icons are in [assets/images](../assets/images). Use the current in-app components and shared tokens when translating a mockup to code.

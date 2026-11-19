@@ -116,17 +116,20 @@ try {
     await page.getByRole('switch').click();
     await shot('04-onboarding');
     await page.getByText('Get started', { exact: true }).click();
-    // Home is the challenges: the 7Lights team's, one per kind of practice.
-    await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
+    // Home is quiet: today's light, and one practice to begin.
+    await page.getByText('Today’s light').waitFor({ timeout: 20_000 });
     await page.getByText('Pick one to begin.').waitFor();
-    await page.getByText('Today’s light').waitFor();
-    await page.locator('[aria-label="Stillness, 6 steps"]').waitFor({ timeout: 20_000 });
-    await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
-    await shot('05-home-challenges');
+    await page.getByText('Suggested for you').waitFor({ timeout: 20_000 });
+    await shot('05-home-today');
     assert.equal((await me.read('boardsOf', { ownerId: me.id })).length, 0, 'no boards until you make one');
   });
 
-  await step('the category chips narrow the list', async () => {
+  await step('practices: paths, the team’s ladder, and chips that narrow the list', async () => {
+    await page.getByText('Practices', { exact: true }).last().click();
+    await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
+    await page.locator('[aria-label="Stillness, 6 steps"]').waitFor({ timeout: 20_000 });
+    await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ timeout: 20_000 });
+    await shot('05a-practices');
     await page.getByText('Movement', { exact: true }).first().click();
     await page.locator('[aria-label="A 20-minute walk, phone away"]').first().waitFor({ timeout: 20_000 });
     await page.locator('[aria-label="10 minutes of stillness"]').first().waitFor({ state: 'detached' });
@@ -170,7 +173,7 @@ try {
   });
 
   await step('explore shows another person’s public board, with its photo', async () => {
-    await page.getByText('Explore', { exact: true }).last().click();
+    await page.getByText('See other people’s boards').click();
     await page.locator(`[aria-label="${boardTitle}"]`).first().waitFor({ timeout: 20_000 });
     await page.waitForTimeout(1500);
     await shot('07-explore');
@@ -202,11 +205,13 @@ try {
 
   await step('joining the team’s breathing challenge and ticking day 1', async () => {
     await page.goto(base);
+    await page.getByText('Today’s light').waitFor({ timeout: 20_000 });
+    await page.getByText('Practices', { exact: true }).last().click();
     await page.getByText('From the 7Lights team').waitFor({ timeout: 20_000 });
     await page.locator(`[aria-label="${challengeTitle}"]`).first().waitFor({ timeout: 20_000 });
     await shot('11-challenges');
-    await page.locator('[aria-label="5 minutes of mindful breathing"]').first().click();
-    await page.getByText('Join', { exact: true }).click();
+    await page.locator('[aria-label="5 minutes of mindful breathing"]').last().click();
+    await page.getByText('Begin', { exact: true }).click();
     await page.getByText('Do day 1').waitFor({ timeout: 20_000 });
     await page.getByText('Breath path · step 2 of 3').waitFor();
     const intention = page.getByPlaceholder('Why are you doing this? Only you can see it.');
@@ -220,8 +225,8 @@ try {
     await page.getByPlaceholder('How did it go today?').waitFor({ timeout: 20_000 });
     await page.getByPlaceholder('How did it go today?').fill('Cinco minutos tranquilos.');
     await shot('13-day-one');
-    await page.getByText('Done', { exact: true }).last().click();
-    await page.getByText('✓ Done').last().waitFor({ timeout: 20_000 });
+    await page.getByText('Complete', { exact: true }).last().click();
+    await page.getByText('✓ Complete').last().waitFor({ timeout: 20_000 });
     await page.getByText('You began. The hardest part is behind you.').waitFor();
     await shot('14-day-ticked');
     await page.getByText('Continue', { exact: true }).click();
@@ -277,12 +282,14 @@ try {
   await step('the app is English-only for now, with no language choices', async () => {
     // The browser above is set to Spanish (es-AR) and every screen so far was in English.
     await page.goto(base);
+    await page.getByText('In progress').waitFor({ timeout: 20_000 });
+    await shot('16b-today-in-progress');
+    await page.getByText('See all practices').click();
     await page.getByText('From the community').waitFor({ timeout: 20_000 });
-    await page.getByText('In progress').waitFor();
     assert.equal(await page.getByText('All languages').count(), 0);
-    await page.getByText('Create a challenge').click();
+    await page.getByText('Create a practice').click();
     await page.getByText('Kind of practice').waitFor({ timeout: 20_000 });
-    assert.equal(await page.getByText('Challenge language').count(), 0);
+    assert.equal(await page.getByText('Practice language').count(), 0);
     await shot('17-create-challenge');
   });
 
