@@ -15,6 +15,10 @@ type TeamChallenge = {
   /** Where it sits in the list. Never reuse a number: it is the row's date. */
   order: number;
   category: string;
+  /** Beginning unless said otherwise. */
+  level?: string;
+  /** By the calendar unless said otherwise. */
+  missed_rule?: string;
   duration_days: number;
   timer_seconds: number | null;
   light: string;
@@ -283,6 +287,7 @@ const TEAM: TeamChallenge[] = [
     slug: 'morning-pages',
     order: 10,
     category: 'writing',
+    level: 'deepening',
     duration_days: 30,
     timer_seconds: 600,
     light: 'ajna',
@@ -338,6 +343,162 @@ const TEAM: TeamChallenge[] = [
       ],
     },
   },
+  {
+    slug: 'loving-kindness',
+    order: 13,
+    category: 'contemplation',
+    level: 'deepening',
+    duration_days: 14,
+    timer_seconds: 600,
+    light: 'anahata',
+    en: {
+      title: 'Ten minutes of wishing well',
+      description:
+        'A practice found, in one form or another, in many traditions: sit quietly and wish someone well, in your own words. Start with yourself, then widen the circle a little each day. Simple phrases are enough: may you be at ease, may you be safe, may your day be kind.',
+      days: [
+        [1, 'Begin with yourself. Wish yourself well, slowly, as you would a friend.'],
+        [3, 'Someone who has been good to you. Picture them and wish them well.'],
+        [5, 'Someone you love without effort.'],
+        [8, 'Someone you barely know: a neighbor, a face from your street.'],
+        [11, 'Someone you find difficult. Only as far as feels honest today.'],
+        [14, 'Last day. Everyone you thought of these two weeks, and then everyone.'],
+      ],
+    },
+  },
+  {
+    slug: 'mantra',
+    order: 14,
+    category: 'mantra',
+    level: 'deepening',
+    duration_days: 21,
+    timer_seconds: 600,
+    light: 'vishuddha',
+    en: {
+      title: 'One phrase, repeated: ten minutes of mantra',
+      description:
+        'Choose a word or a short phrase that means something to you: from a tradition you love, from a prayer you grew up with, or in your own words. Repeat it for ten minutes, aloud or silently, and each time you drift, come back to it. Keep the same one for the twenty-one days.',
+      days: [
+        [1, 'Choose your phrase today, and stay with it. It does not have to be perfect.'],
+        [4, 'Say it aloud today, quietly, and listen to the sound.'],
+        [8, 'Today, repeat it in silence, in time with your breath.'],
+        [12, 'Carry it out of the sitting: once on waking, once before sleep.'],
+        [17, 'Let the repetition slow down until there is space between the words.'],
+        [21, 'Last day. After the ten minutes, sit a little in the quiet that follows.'],
+      ],
+    },
+  },
+  {
+    slug: 'alternate-nostril',
+    order: 15,
+    category: 'breath',
+    level: 'deepening',
+    duration_days: 14,
+    timer_seconds: 300,
+    light: 'ajna',
+    en: {
+      title: 'Alternate-nostril breathing, five minutes',
+      description:
+        'An old yogic breathing practice. Close the right nostril with your thumb and breathe in through the left; close the left with your ring finger and breathe out through the right; in through the right, out through the left. That is one round. Breathe softly, without holding, and if you feel dizzy, stop and breathe normally.',
+      days: [
+        [1, 'Learn the pattern slowly. Getting lost and starting again is part of it.'],
+        [4, 'Make the in-breath and the out-breath the same length.'],
+        [7, 'One week. Let the breath grow quieter, almost without sound.'],
+        [10, 'Let the out-breath run a little longer than the in-breath.'],
+        [14, 'Last day. When the timer ends, sit for a minute breathing naturally.'],
+      ],
+    },
+  },
+  {
+    slug: 'twenty-stillness',
+    order: 16,
+    category: 'meditation',
+    level: 'deepening',
+    duration_days: 21,
+    timer_seconds: 1200,
+    light: 'sahasrara',
+    en: {
+      title: '20 minutes of stillness',
+      description:
+        'Twenty minutes of sitting, every day for three weeks. Long enough to get restless, bored and quiet, sometimes all in one sitting. Use whatever anchor is yours: the breath, a sound, a word, or just sitting.',
+      days: [
+        [1, 'Settle your seat first. Twenty minutes is easier when the body is steady.'],
+        [5, 'When restlessness comes, feel where it lives in the body before you move.'],
+        [10, 'Halfway. Notice the moment just before a thought carries you off.'],
+        [15, 'Today, drop the anchor for the last five minutes and simply sit.'],
+        [21, 'Last day. Ask yourself what you want your daily sitting to be from here.'],
+      ],
+    },
+  },
+  {
+    slug: 'self-inquiry',
+    order: 17,
+    category: 'contemplation',
+    level: 'deepening',
+    duration_days: 21,
+    timer_seconds: 600,
+    light: 'ajna',
+    en: {
+      title: 'One question, ten minutes',
+      description:
+        'Each day, sit with one question for ten minutes. Not to answer it: to keep asking and see what comes up underneath the first answer. On the days with no question given, return to the last one, or bring your own.',
+      days: [
+        [1, 'What do I actually want?'],
+        [4, 'What am I pretending not to know?'],
+        [7, 'What would I do if I were not afraid?'],
+        [10, 'Who am I when nobody needs anything from me?'],
+        [13, 'What am I holding on to that is already over?'],
+        [16, 'Where in my life am I already free?'],
+        [19, 'What is asking for my attention right now?'],
+        [21, 'Last day. Which of these questions is still alive for you? Stay with that one.'],
+      ],
+    },
+  },
+  {
+    slug: 'hour-of-silence',
+    order: 18,
+    category: 'meditation',
+    level: 'committed',
+    duration_days: 21,
+    timer_seconds: 3600,
+    light: 'vishuddha',
+    en: {
+      title: 'An hour of silence a day',
+      description:
+        'One hour each day without speaking, without a screen, without music or reading. You can sit, walk, cook or look out of a window: the practice is the silence, not the posture. Tell the people you live with, so the hour is protected.',
+      days: [
+        [1, 'Choose your hour and tell whoever needs to know.'],
+        [4, 'Notice what you reach for when there is nothing to fill the quiet.'],
+        [8, 'Spend part of today’s hour outdoors, if you can.'],
+        [12, 'Listen to the silence itself, under the sounds.'],
+        [17, 'Do one ordinary task in today’s hour, at half its usual speed.'],
+        [21, 'Last day. Decide how much silence you want to keep in your days.'],
+      ],
+    },
+  },
+  {
+    slug: 'forty-days',
+    order: 19,
+    category: 'meditation',
+    level: 'committed',
+    missed_rule: 'strict',
+    duration_days: 40,
+    timer_seconds: 1800,
+    light: 'sahasrara',
+    en: {
+      title: 'Forty days, unbroken',
+      description:
+        'Many traditions keep a practice for forty days in a row to let it take root. Choose your own: sitting, prayer, mantra, breath, movement. Thirty minutes, every day, the same practice. Miss a day and you begin again from day one. That is the agreement, and it is kinder than it sounds.',
+      days: [
+        [1, 'Name your practice and the time of day. Write both in today’s note.'],
+        [7, 'One week. The novelty is gone; this is where the practice starts.'],
+        [14, 'Notice the stories about why today is the exception. Then practice.'],
+        [21, 'Halfway and a little more. What is different from day one?'],
+        [28, 'Four weeks. Let the practice be plain today, with nothing to get from it.'],
+        [35, 'Five days left. Do not hurry toward the end.'],
+        [40, 'Forty days. Sit a while after the timer, and thank whatever brought you here.'],
+      ],
+    },
+  },
 ];
 
 export async function seed(): Promise<{ created: number; challenges: number }> {
@@ -359,8 +520,9 @@ export async function seed(): Promise<{ created: number; challenges: number }> {
         description: copy.description,
         duration_days: entry.duration_days,
         locale,
-        missed_rule: 'calendar',
+        missed_rule: entry.missed_rule ?? 'calendar',
         category: entry.category,
+        level: entry.level ?? 'beginning',
         light: entry.light,
         timer_seconds: entry.timer_seconds,
         audio_path: null,
@@ -379,12 +541,14 @@ export async function seed(): Promise<{ created: number; challenges: number }> {
         created++;
       } catch (error) {
         if ((error as Error).name !== 'ConditionalCheckFailedException') throw error;
-        // Seeded before categories existed: give it one, and touch nothing else.
-        await update(challenge.pk, 'A', {
-          set: { category: entry.category },
-          condition: 'attribute_not_exists(#category)',
-          names: { '#category': 'category' },
-        });
+        // Seeded before categories or levels existed: give it them, and touch nothing else.
+        for (const [name, value] of [['category', challenge.category], ['level', challenge.level]]) {
+          await update(challenge.pk, 'A', {
+            set: { [name]: value },
+            condition: 'attribute_not_exists(#missing)',
+            names: { '#missing': name },
+          });
+        }
       }
       await batchWrite([
         { pk: `CHLO#${locale}`, sk: id },

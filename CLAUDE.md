@@ -1,9 +1,12 @@
 # 7Lights — working notes
 
 A free app to raise your frequency. **Challenges are the product**: daily
-practices of any kind (breath, meditation, movement, writing, rest, habits,
-chakras…) that anyone can create and join; a starter series is signed by the
-7Lights team, and every challenge has an invite link. **Vision boards** are a
+practices of any kind (breath, meditation, contemplation, mantra, movement,
+writing, rest, habits, chakras…) that anyone can create and join. The app is
+non-denominational and built as a ladder: every challenge has a level
+(beginning, deepening, committed; `src/data/levels.ts`), and the 7Lights
+team's series runs from a few minutes a day to forty days unbroken. Every
+challenge has an invite link. **Vision boards** are a
 second, optional tool: nobody starts with any, and a new one comes from a
 blank page or a template (a year, life areas, a project, gratitude, the seven
 chakras). Chakras are one category and one template among the others, not the
@@ -79,6 +82,8 @@ tests/e2e/web.mjs                  a browser walk through the web build
 - Nothing about food, diets, fasting or weight: not in team challenges, and
   the community rules forbid it in everyone's.
 - A new category goes in `rules.ts` (CATEGORIES) and `src/data/categories.ts`, with the same id.
+- Deeper practices are described as shared across traditions, never credited
+  to one or taught as doctrine. Breathing practices stay gentle: no long holds.
 - Borrowed photos and texts carry no credit.
 
 ## Running and checking

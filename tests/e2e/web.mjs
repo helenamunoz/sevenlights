@@ -84,7 +84,7 @@ try {
 
   await step('sign-in screen asks Cognito for a code', async () => {
     await page.goto(base);
-    await page.getByText('Daily challenges and vision boards').waitFor();
+    await page.getByText('Raise our frequency together.').waitFor();
     await shot('01-sign-in');
     await page.getByPlaceholder('you@example.com').fill(email);
     await page.getByText('Send code').click();

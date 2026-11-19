@@ -25,7 +25,7 @@ export const es = {
   'tabs.challenges': 'Desafíos',
   'tabs.profile': 'Perfil',
 
-  'signIn.tagline': 'Desafíos diarios y tableros de visión para elevar tu frecuencia.',
+  'signIn.tagline': 'Elevemos nuestra frecuencia, en compañía.',
   'signIn.email': 'Tu email',
   'signIn.emailPlaceholder': 'vos@ejemplo.com',
   'signIn.emailHint': 'Te mandamos un código de un solo uso. Sin contraseñas.',
@@ -225,6 +225,7 @@ export const es = {
   'new.durationPlaceholder': 'Cantidad de días',
   'new.rule': 'Si alguien se saltea un día',
   'new.language': 'Idioma del desafío',
+  'new.level': 'Nivel',
   'new.category': 'Tipo de práctica',
   'new.light': 'Centro',
   'new.eachDay': 'Qué trae cada día',

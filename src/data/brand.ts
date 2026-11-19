@@ -22,11 +22,13 @@ export const chakraCovers: Record<ChakraId, number> = {
 const categoryCovers: Record<Exclude<CategoryId, 'chakras'>, number> = {
   breath: artwork.dusk,
   meditation: chakraCovers.sahasrara,
+  contemplation: chakraCovers.anahata,
+  mantra: chakraCovers.vishuddha,
   movement: chakraCovers.muladhara,
   writing: artwork.notebook,
   rest: chakraCovers.ajna,
   habits: chakraCovers.svadhisthana,
-  other: chakraCovers.anahata,
+  other: artwork.dusk,
 };
 
 type Themed = Pick<Challenge, 'category' | 'light'>;

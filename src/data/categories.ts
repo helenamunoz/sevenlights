@@ -9,6 +9,8 @@ import { afterglow, mix } from '@/theme/tokens';
 export const CATEGORY_IDS = [
   'breath',
   'meditation',
+  'contemplation',
+  'mantra',
   'movement',
   'writing',
   'rest',
@@ -29,6 +31,8 @@ export type Category = {
 export const CATEGORIES: Category[] = [
   { id: 'breath', name: { es: 'Respiración', en: 'Breath' }, color: afterglow.mauve },
   { id: 'meditation', name: { es: 'Meditación', en: 'Meditation' }, color: mix(afterglow.violet, afterglow.cream, 0.3) },
+  { id: 'contemplation', name: { es: 'Contemplación', en: 'Contemplation' }, color: mix(afterglow.mauve, afterglow.cream, 0.45) },
+  { id: 'mantra', name: { es: 'Mantra', en: 'Mantra' }, color: mix(afterglow.honey, afterglow.cream, 0.4) },
   { id: 'movement', name: { es: 'Movimiento', en: 'Movement' }, color: afterglow.amber },
   { id: 'writing', name: { es: 'Escritura', en: 'Writing' }, color: afterglow.honey },
   { id: 'rest', name: { es: 'Descanso', en: 'Rest' }, color: mix(afterglow.plum, afterglow.cream, 0.35) },

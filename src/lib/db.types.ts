@@ -1,5 +1,6 @@
 import type { CategoryId } from '@/data/categories';
 import type { ChakraId } from '@/data/chakras';
+import type { LevelId } from '@/data/levels';
 import type { Locale } from '@/lib/i18n';
 
 /** Row shapes, as the backend in amplify/functions/api returns them. */
@@ -63,6 +64,8 @@ export type Challenge = {
   missed_rule: MissedRule;
   /** Missing on challenges from before categories existed; read it with categoryOf(). */
   category?: CategoryId;
+  /** Missing on challenges from before levels existed; read it with levelOf(). */
+  level?: LevelId;
   /** Only meaningful when the category is chakras. */
   light: ChakraId;
   timer_seconds: number | null;

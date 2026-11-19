@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { CategoryId } from '@/data/categories';
 import type { ChakraId } from '@/data/chakras';
+import type { LevelId } from '@/data/levels';
 import { useMe } from '@/lib/auth';
 import { localDate, progress, type Progress } from '@/lib/days';
 import { read, write } from '@/lib/aws';
@@ -299,6 +300,7 @@ export type NewChallenge = {
   locale: Locale;
   missed_rule: MissedRule;
   category: CategoryId;
+  level: LevelId;
   light: ChakraId;
   timer_seconds: number | null;
   link_url: string | null;

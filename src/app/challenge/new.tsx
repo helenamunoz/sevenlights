@@ -8,9 +8,10 @@ import { BackBar, Button, Input, Label, Screen, Segmented, Title, useToast } fro
 import { challengeColor } from '@/data/brand';
 import type { CategoryId } from '@/data/categories';
 import type { ChakraId } from '@/data/chakras';
+import { LEVELS, levelOf, type LevelId } from '@/data/levels';
 import { useCreateChallenge, type PickedAudio } from '@/lib/api/challenges';
 import type { MissedRule } from '@/lib/db.types';
-import { LANGUAGES, locale, t, type Locale, type TextKey } from '@/lib/i18n';
+import { LANGUAGES, locale, t, tr, type Locale, type TextKey } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
 
 const DURATIONS = ['7', '21', '30', '49'];
@@ -35,6 +36,7 @@ export default function NewChallengeScreen() {
   const [rule, setRule] = useState<MissedRule>('calendar');
   const [language, setLanguage] = useState<Locale>(locale);
   const [category, setCategory] = useState<CategoryId>('other');
+  const [level, setLevel] = useState<LevelId>('beginning');
   const [light, setLight] = useState<ChakraId>('anahata');
   const [minutes, setMinutes] = useState('');
   const [link, setLink] = useState('');
@@ -76,6 +78,7 @@ export default function NewChallengeScreen() {
         locale: language,
         missed_rule: rule,
         category,
+        level,
         light,
         timer_seconds: timerMinutes === null ? null : Math.max(10, Math.round(timerMinutes * 60)),
         link_url: url || null,
@@ -161,6 +164,16 @@ export default function NewChallengeScreen() {
         </View>
         </>
       ) : null}
+
+      <Label>{t('new.level')}</Label>
+      <View style={styles.block}>
+        <Segmented
+          value={level}
+          onChange={setLevel}
+          options={LEVELS.map((option) => ({ value: option.id, label: tr(option.name) }))}
+        />
+        <Text style={styles.hint}>{tr(levelOf({ level }).about)}</Text>
+      </View>
 
       <Label>{t('new.category')}</Label>
       <CategoryPicker value={category} onChange={setCategory} />

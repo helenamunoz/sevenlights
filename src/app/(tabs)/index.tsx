@@ -6,6 +6,7 @@ import { ChallengeCard } from '@/components/challenge-card';
 import { CategoryPicker } from '@/components/pickers';
 import { Button, Empty, Label, Loading, Screen, Segmented, Title } from '@/components/ui';
 import { categoryOf, type CategoryId } from '@/data/categories';
+import { LEVELS, levelOf } from '@/data/levels';
 import {
   useChallenges,
   useMemberships,
@@ -14,12 +15,13 @@ import {
   type ChallengeSort,
 } from '@/lib/api/challenges';
 import { progress } from '@/lib/days';
-import { LANGUAGES, locale, t, type Locale } from '@/lib/i18n';
+import { LANGUAGES, locale, t, tr, type Locale } from '@/lib/i18n';
 import { color, font, space } from '@/theme/tokens';
 
 /**
  * Home. The challenges you are doing, then what to join next: the 7Lights
- * team's and the community's, of every kind of practice or just one.
+ * team's as a ladder from beginning to committed, and the community's, of
+ * every kind of practice or just one.
  */
 export default function ChallengesScreen() {
   const router = useRouter();
@@ -77,9 +79,19 @@ export default function ChallengesScreen() {
       {fromTeam.length ? (
         <View style={styles.section}>
           <Label>{t('challenges.suggested')}</Label>
-          {fromTeam.map((challenge) => (
-            <ChallengeCard key={challenge.id} challenge={challenge} />
-          ))}
+          {LEVELS.map((level) => {
+            const rung = fromTeam.filter((challenge) => levelOf(challenge).id === level.id);
+            if (rung.length === 0) return null;
+            return (
+              <View key={level.id}>
+                <Text style={styles.level}>{tr(level.name)}</Text>
+                <Text style={styles.levelAbout}>{tr(level.about)}</Text>
+                {rung.map((challenge) => (
+                  <ChallengeCard key={challenge.id} challenge={challenge} />
+                ))}
+              </View>
+            );
+          })}
         </View>
       ) : null}
 
@@ -121,6 +133,15 @@ export default function ChallengesScreen() {
 const styles = StyleSheet.create({
   section: { marginBottom: space.lg },
   filters: { gap: space.sm, marginBottom: space.md },
+  level: { fontFamily: font.display, fontSize: 24, lineHeight: 30, color: color.text, marginTop: space.sm },
+  levelAbout: {
+    fontFamily: font.body,
+    fontSize: 14,
+    lineHeight: 21,
+    color: color.textSoft,
+    marginTop: space.xs,
+    marginBottom: space.md,
+  },
   start: {
     fontFamily: font.body,
     fontSize: 15,

@@ -24,7 +24,7 @@ export const en: Record<keyof typeof es, string> = {
   'tabs.challenges': 'Challenges',
   'tabs.profile': 'Profile',
 
-  'signIn.tagline': 'Daily challenges and vision boards to raise your frequency.',
+  'signIn.tagline': 'Raise our frequency together.',
   'signIn.email': 'Your email',
   'signIn.emailPlaceholder': 'you@example.com',
   'signIn.emailHint': 'We’ll send you a one-time code. No passwords.',
@@ -224,6 +224,7 @@ export const en: Record<keyof typeof es, string> = {
   'new.durationPlaceholder': 'Number of days',
   'new.rule': 'If someone misses a day',
   'new.language': 'Challenge language',
+  'new.level': 'Level',
   'new.category': 'Kind of practice',
   'new.light': 'Center',
   'new.eachDay': 'What each day holds',

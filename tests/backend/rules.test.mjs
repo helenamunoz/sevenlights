@@ -228,6 +228,7 @@ test('challenges: what a creator can and cannot set', async () => {
   const created = await ana.read('challenge', { id: state.calendar });
   assert.equal(created.is_official, false, 'self-official');
   assert.equal(created.category, 'other', 'no category given');
+  assert.equal(created.level, 'beginning', 'no level given');
   assert.equal(created.rank, 0, 'forged rank');
   assert.equal(created.up_count, 0);
   assert.equal(created.member_count, 1, 'the creator is its first member');
@@ -253,7 +254,18 @@ test('challenges: what a creator can and cannot set', async () => {
     ana.write('createChallenge', { ...base, title: 'Tipo', duration_days: 3, category: 'astrology' }),
     'bad_category'
   );
-  state.walk = await ana.write('createChallenge', { ...base, title: `Caminar ${run}`, duration_days: 3, category: 'movement' });
+  await refused(
+    ana.write('createChallenge', { ...base, title: 'Nivel', duration_days: 3, level: 'enlightened' }),
+    'bad_level'
+  );
+  state.walk = await ana.write('createChallenge', {
+    ...base,
+    title: `Caminar ${run}`,
+    duration_days: 3,
+    category: 'movement',
+    level: 'committed',
+  });
+  assert.equal((await ana.read('challenge', { id: state.walk })).level, 'committed');
   const moving = await bea.read('challenges', { sort: 'new', language: 'es', category: 'movement' });
   assert.ok(moving.some((c) => c.id === state.walk));
   assert.ok(moving.every((c) => c.category === 'movement'));
@@ -467,9 +479,17 @@ test('seed: the 7Lights team challenges, in order, safe to repeat', async () => 
   }
   for (const locale of ['es', 'en']) {
     const suggested = await bea.read('suggestedChallenges', { locale });
-    // The first six exist in both languages; the newer six are English-only for now.
+    // The first six exist in both languages; the newer ones are English-only for now.
     const first = ['breath', 'meditation', 'movement', 'writing', 'rest', 'chakras'];
-    const newer = ['habits', 'breath', 'movement', 'writing', 'habits', 'meditation'];
+    const newer = [
+      ...['habits', 'breath', 'movement', 'writing', 'habits', 'meditation'],
+      ...['contemplation', 'mantra', 'breath', 'meditation', 'contemplation', 'meditation', 'meditation'],
+    ];
+    if (locale === 'en') {
+      const count = (level) => suggested.filter((c) => c.level === level).length;
+      assert.deepEqual([count('beginning'), count('deepening'), count('committed')], [11, 6, 2]);
+      assert.equal(suggested.at(-1).missed_rule, 'strict', 'forty days, unbroken');
+    }
     assert.ok(suggested.every((c) => c.is_official && c.creator_id === null));
     assert.deepEqual(suggested.map((c) => c.category), locale === 'en' ? [...first, ...newer] : first);
     assert.ok(!suggested.some((c) => c.id.startsWith('official-water-')), 'retired challenges are not offered');
